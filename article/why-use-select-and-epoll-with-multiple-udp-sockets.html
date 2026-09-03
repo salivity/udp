@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Use select and epoll with Multiple UDP Sockets - udp</title>
+    <meta name="description" content="Managing multiple UDP sockets using traditional blocking I/O models often introduces severe performance bottlenecks, high memory consumption, and unnecessary thread management complexity. System calls like select() and epoll() solve this by providing I/O">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/why-use-select-and-epoll-with-multiple-udp-sockets">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why Use select and epoll with Multiple UDP Sockets - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/why-use-select-and-epoll-with-multiple-udp-sockets" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Managing multiple UDP sockets using traditional blocking I/O models often introduces severe performance bottlenecks, high memory consumption, and unnecessary thread management complexity. System calls like select() and epoll() solve this by providing I/O" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="why-use-select-and-epoll-with-multiple-udp-sockets">Why Use
+select and epoll with Multiple UDP Sockets</h1>
+<p>Managing multiple UDP sockets using traditional blocking I/O models
+often introduces severe performance bottlenecks, high memory
+consumption, and unnecessary thread management complexity. System calls
+like <code>select()</code> and <code>epoll()</code> solve this by
+providing I/O multiplexing, which allows a single thread to monitor
+multiple socket file descriptors simultaneously. Instead of blocking on
+a single socket or spinning CPU cycles polling every connection, an
+application can wait efficiently until one or more UDP sockets are ready
+to send or receive data, maximizing throughput and resource
+utilization.</p>
+<h3 id="the-challenge-of-multiple-udp-sockets">The Challenge of Multiple
+UDP Sockets</h3>
+<p>When an application must listen to multiple UDP ports, interfaces, or
+multicast groups, standard blocking calls like <code>recvfrom()</code>
+become problematic:</p>
+<ul>
+<li><strong>Indefinite Blocking:</strong> Calling
+<code>recvfrom()</code> on one inactive socket prevents the application
+from reading packets arriving on other sockets.</li>
+<li><strong>Thread-Per-Socket Overhead:</strong> Spawning dedicated
+threads for each socket incurs high memory overhead and frequent CPU
+context switching, which degrades performance at scale.</li>
+<li><strong>Busy-Waiting:</strong> Using non-blocking sockets in an
+active polling loop consumes 100% of CPU time, even when no traffic is
+present.</li>
+</ul>
+<h3 id="how-select-and-epoll-solve-the-problem">How
+<code>select()</code> and <code>epoll()</code> Solve the Problem</h3>
+<p>I/O multiplexing delegates socket monitoring directly to the
+operating system kernel. Instead of the application checking each socket
+individually, the kernel wakes the application only when a datagram
+arrives on any monitored descriptor.</p>
+<h4 id="1-centralized-event-notification">1. Centralized Event
+Notification</h4>
+<p>Both system calls allow an application to pass a list of UDP file
+descriptors to the kernel. When network data arrives at any of the
+monitored sockets, the kernel marks the socket as readable and returns
+control to the user space. The application can then immediately execute
+<code>recvfrom()</code> without the risk of blocking.</p>
+<h4 id="2-scalable-resource-management">2. Scalable Resource
+Management</h4>
+<p>By handling multiple UDP streams within an event-driven loop on a
+single thread (or a controlled thread pool), applications eliminate
+thread creation costs, synchronization locks, and context-switching
+latency.</p>
+<h4 id="3-simultaneous-multi-port-and-multi-interface-handling">3.
+Simultaneous Multi-Port and Multi-Interface Handling</h4>
+<p>Applications such as DNS resolvers, VoIP gateways, and VPN servers
+frequently monitor distinct UDP ports and virtual interfaces
+simultaneously. Multiplexing allows these services to consolidate all
+ingress UDP traffic into a single coherent processing loop.</p>
+<h3 id="choosing-between-select-and-epoll">Choosing Between
+<code>select()</code> and <code>epoll()</code></h3>
+<p>While both system calls achieve I/O multiplexing, their performance
+characteristics differ significantly under load:</p>
+<ul>
+<li><p><strong><code>select()</code>:</strong></p>
+<ul>
+<li>Supported on virtually all POSIX-compliant platforms, making it
+highly portable.</li>
+<li>Scales linearly (<span class="math inline">\(O(N)\)</span>) with the
+number of descriptors, requiring the kernel and application to scan the
+entire descriptor set on each call.</li>
+<li>Restricted by a fixed descriptor limit (typically
+<code>FD_SETSIZE = 1024</code>).</li>
+<li>Best suited for low socket counts or cross-platform legacy
+applications.</li>
+</ul></li>
+<li><p><strong><code>epoll()</code>:</strong></p>
+<ul>
+<li>Linux-specific API designed for high-concurrency environments.</li>
+<li>Scales in constant time (<span class="math inline">\(O(1)\)</span>)
+relative to monitored descriptors by using an in-kernel event table,
+making it capable of managing tens of thousands of UDP sockets without
+performance degradation.</li>
+<li>Supports both Level-Triggered and Edge-Triggered notification modes,
+offering granular control over datagram ingestion.</li>
+<li>Best suited for modern, high-performance network services on
+Linux.</li>
+</ul></li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

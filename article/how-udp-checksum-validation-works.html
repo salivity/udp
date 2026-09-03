@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How UDP Checksum Validation Works - udp</title>
+    <meta name="description" content="The User Datagram Protocol (UDP) employs a 16-bit checksum field to ensure that data has not been corrupted during transit across a network. When a receiver gets a UDP datagram, it verifies the packet's integrity by constructing a pseudo-header from the">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-udp-checksum-validation-works">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How UDP Checksum Validation Works - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-udp-checksum-validation-works" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The User Datagram Protocol (UDP) employs a 16-bit checksum field to ensure that data has not been corrupted during transit across a network. When a receiver gets a UDP datagram, it verifies the packet's integrity by constructing a pseudo-header from the" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-udp-checksum-validation-works">How UDP Checksum Validation
+Works</h1>
+<p>The User Datagram Protocol (UDP) employs a 16-bit checksum field to
+ensure that data has not been corrupted during transit across a network.
+When a receiver gets a UDP datagram, it verifies the packet's integrity
+by constructing a pseudo-header from the IP layer, combining it with the
+UDP header and payload, and computing the one's complement sum across
+all 16-bit words. If the computed result matches the expected
+mathematical constant—or matches the transmitted checksum value—the
+receiver accepts the packet; otherwise, it discards the corrupted
+datagram.</p>
+<h3 id="the-pseudo-header-construction">The Pseudo-Header
+Construction</h3>
+<p>Before evaluating the checksum, the receiver constructs a temporary
+"pseudo-header" derived from the encapsulating IP packet. This mechanism
+guarantees that the packet was delivered to the correct IP address and
+port without routing misdirection. The pseudo-header includes:</p>
+<ul>
+<li><strong>Source IP Address:</strong> Extracted from the IP
+header.</li>
+<li><strong>Destination IP Address:</strong> Extracted from the IP
+header.</li>
+<li><strong>Zero Padding &amp; Protocol Identifier:</strong> A single
+byte of zeros followed by the protocol number (<code>17</code> for
+UDP).</li>
+<li><strong>UDP Length:</strong> The total length of the UDP header plus
+the payload, extracted from the UDP header.</li>
+</ul>
+<h3 id="alignment-and-padding">Alignment and Padding</h3>
+<p>The checksum algorithm operates strictly on 16-bit (2-byte) words. If
+the total length of the UDP data payload is an odd number of octets, the
+receiver appends a single zero-byte (<code>0x00</code>) to the end of
+the payload for calculation purposes. This pad byte is purely temporary
+and is not delivered to the receiving application.</p>
+<h3 id="the-verification-algorithm">The Verification Algorithm</h3>
+<p>The receiver validates the datagram using one's complement arithmetic
+through one of two standard approaches:</p>
+<h4 id="method-1-total-sum-evaluation-standard-implementation">Method 1:
+Total Sum Evaluation (Standard Implementation)</h4>
+<ol type="1">
+<li>The receiver treats the pseudo-header, the full UDP header
+(including the received checksum value), and the data payload as a
+continuous sequence of 16-bit integers.</li>
+<li>It sums all 16-bit words together. Whenever an addition results in a
+carry-out beyond 16 bits, the carry bit is wrapped around and added back
+to the lowest bit (end-around carry).</li>
+<li>Because the sender inverted the sum before sending, adding the
+sender's checksum to the data sum should theoretically yield a 16-bit
+word consisting entirely of ones (<code>0xFFFF</code>).</li>
+<li>If the final sum equals <code>0xFFFF</code> (or <code>0x0000</code>
+in inverted representation), the packet passes validation.</li>
+</ol>
+<h4 id="method-2-recalculation-and-comparison">Method 2: Recalculation
+and Comparison</h4>
+<ol type="1">
+<li>The receiver stores the transmitted checksum value and temporarily
+replaces the checksum field in the UDP header with
+<code>0x0000</code>.</li>
+<li>It sums all 16-bit words of the pseudo-header, UDP header, and
+payload using one's complement addition.</li>
+<li>The receiver takes the one's complement (bitwise NOT) of the
+calculated sum.</li>
+<li>It compares this newly calculated value to the original transmitted
+checksum:
+<ul>
+<li><strong>Match:</strong> The data is intact.</li>
+<li><strong>Mismatch:</strong> The data has been altered or corrupted in
+transit.</li>
+</ul></li>
+</ol>
+<h3 id="edge-cases-and-action-taken">Edge Cases and Action Taken</h3>
+<ul>
+<li><strong>Checksum Value of Zero (<code>0x0000</code>):</strong> In
+IPv4, UDP checksums are optional. If the checksum field is set to
+<code>0x0000</code>, it signifies that the sender did not compute a
+checksum, and the receiver skips validation entirely. In IPv6, UDP
+checksums are mandatory, and a value of <code>0x0000</code> is
+considered an error.</li>
+<li><strong>Checksum Value of <code>0xFFFF</code>:</strong> If a sender
+calculates a checksum that results in <code>0x0000</code>, it transmits
+<code>0xFFFF</code> instead, distinguishing a valid zero-value
+calculation from a disabled checksum.</li>
+<li><strong>Corrupted Datagrams:</strong> If the validation fails, UDP
+does not attempt error recovery or retransmission. The receiver silently
+drops the packet, relying on higher-layer protocols (such as
+application-level recovery) to handle the missing data.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

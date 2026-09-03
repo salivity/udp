@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Authenticate a UDP Datagram Sender - udp</title>
+    <meta name="description" content="The User Datagram Protocol (UDP) is fundamentally stateless and does not include built-in mechanisms to verify the identity of a sender, leaving it vulnerable to IP spoofing. Because the source IP address in a raw UDP header can be easily forged, authent">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-to-authenticate-a-udp-datagram-sender">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Authenticate a UDP Datagram Sender - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-to-authenticate-a-udp-datagram-sender" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The User Datagram Protocol (UDP) is fundamentally stateless and does not include built-in mechanisms to verify the identity of a sender, leaving it vulnerable to IP spoofing. Because the source IP address in a raw UDP header can be easily forged, authent" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-authenticate-a-udp-datagram-sender">How to Authenticate a
+UDP Datagram Sender</h1>
+<p>The User Datagram Protocol (UDP) is fundamentally stateless and does
+not include built-in mechanisms to verify the identity of a sender,
+leaving it vulnerable to IP spoofing. Because the source IP address in a
+raw UDP header can be easily forged, authenticating the sender requires
+applying cryptographic mechanisms or validation handshakes at either the
+network, transport, or application layers. This article explores the
+primary methods used to establish sender identity and ensure data
+integrity in UDP communications.</p>
+<h3 id="1-datagram-transport-layer-security-dtls">1. Datagram Transport
+Layer Security (DTLS)</h3>
+<p>DTLS is the standard transport-layer security protocol designed
+specifically for datagram-based applications. Modeled after TLS, DTLS
+provides communications privacy, data integrity, and sender
+authentication while handling the packet loss and reordering inherent to
+UDP.</p>
+<ul>
+<li><strong>How it works:</strong> During the DTLS handshake, the client
+and server can authenticate one another using X.509 digital certificates
+or pre-shared keys (PSK).</li>
+<li><strong>Integrity and Authenticity:</strong> Once the handshake is
+complete, every datagram includes a Message Authentication Code (MAC)
+derived from shared session keys, ensuring the packet originated from
+the authenticated peer and was not modified in transit.</li>
+</ul>
+<h3 id="2-ipsec-network-layer-authentication">2. IPsec (Network Layer
+Authentication)</h3>
+<p>Internet Protocol Security (IPsec) operates at the network layer
+(Layer 3) to authenticate and encrypt IP packets, securing all UDP
+traffic traveling between two hosts or gateways.</p>
+<ul>
+<li><strong>Authentication Header (AH):</strong> Provides connectionless
+data integrity and data origin authentication for the entire IP packet,
+including the source address and UDP payload.</li>
+<li><strong>Encapsulating Security Payload (ESP):</strong> Provides
+origin authentication, integrity, and confidentiality (encryption) for
+the payload.</li>
+<li><strong>Mechanism:</strong> IPsec uses the Internet Key Exchange
+(IKEv2) protocol to authenticate devices using certificates, shared
+secrets, or public-key cryptography before establishing Security
+Associations (SAs).</li>
+</ul>
+<h3 id="3-application-layer-hmac-and-digital-signatures">3.
+Application-Layer HMAC and Digital Signatures</h3>
+<p>When protocol-level wrappers like DTLS or IPsec are not suitable,
+sender authentication can be embedded directly into the application
+payload.</p>
+<ul>
+<li><strong>Hash-based Message Authentication Codes (HMAC):</strong> The
+sender and receiver share a pre-distributed secret key. The sender
+calculates an HMAC across the payload, timestamp, and a sequence number,
+appending this tag to the message. The receiver recalculates the hash
+using the shared secret to verify the sender.</li>
+<li><strong>Asymmetric Digital Signatures:</strong> The sender signs the
+datagram payload using their private key (e.g., via Ed25519 or RSA). The
+receiver verifies the signature using the sender's public key.</li>
+<li><strong>Replay Protection:</strong> To prevent attackers from
+capturing and re-sending legitimate packets, application-level
+authentication must include monotonically increasing sequence numbers or
+synchronized timestamps.</li>
+</ul>
+<h3
+id="4-challenge-response-handshakes-and-return-routability-cookies">4.
+Challenge-Response Handshakes and Return Routability (Cookies)</h3>
+<p>For systems where public-key cryptography on every packet is too
+resource-intensive, challenge-response mechanisms verify that the sender
+actually owns the IP address they claim to be using.</p>
+<ul>
+<li><strong>Stateless Cookies:</strong> When a client sends an initial
+request, the server responds with a small cryptographic "cookie" or
+token sent back to the source IP address.</li>
+<li><strong>Return Routability:</strong> The client must include this
+token in subsequent UDP packets. Because an attacker spoofing an
+arbitrary IP address cannot intercept the response containing the
+cookie, they cannot complete the exchange. Protocols like QUIC, SIP, and
+DNS Cookies utilize this approach to mitigate spoofing and amplification
+attacks.</li>
+</ul>
+<h3 id="5-wireguard-and-modern-noise-based-protocols">5. WireGuard and
+Modern Noise-Based Protocols</h3>
+<p>Modern UDP-based tunneling solutions, such as WireGuard, utilize the
+Noise Protocol Framework to provide lightweight, high-speed sender
+authentication.</p>
+<ul>
+<li><strong>Public Key Routing:</strong> WireGuard binds static public
+keys directly to permitted internal IP addresses.</li>
+<li><strong>Cryptographic Identity:</strong> Every UDP datagram is
+encapsulated using authenticated encryption (such as ChaCha20-Poly1305),
+meaning packets are discarded automatically if they fail decryption
+against the expected sender's public key.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

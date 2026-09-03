@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Determine Optimal MTU Size for UDP Programmatically - udp</title>
+    <meta name="description" content="Determining the optimal Maximum Transmission Unit (MTU) before transmitting UDP packets is essential for maximizing network throughput while avoiding IP fragmentation and silent packet drops. Because UDP does not provide built-in connection or path disco">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/determine-optimal-mtu-size-for-udp-programmatically">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Determine Optimal MTU Size for UDP Programmatically - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/determine-optimal-mtu-size-for-udp-programmatically" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Determining the optimal Maximum Transmission Unit (MTU) before transmitting UDP packets is essential for maximizing network throughput while avoiding IP fragmentation and silent packet drops. Because UDP does not provide built-in connection or path disco" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="determine-optimal-mtu-size-for-udp-programmatically">Determine
+Optimal MTU Size for UDP Programmatically</h1>
+<p>Determining the optimal Maximum Transmission Unit (MTU) before
+transmitting UDP packets is essential for maximizing network throughput
+while avoiding IP fragmentation and silent packet drops. Because UDP
+does not provide built-in connection or path discovery mechanisms like
+TCP, developers must rely on OS-level socket options, Path MTU Discovery
+(PMTUD), or application-level probing techniques. This guide outlines
+the primary programmatic methods to discover and calculate the optimal
+UDP packet size across varying network paths.</p>
+<h3 id="1-os-level-path-mtu-querying-linux">1. OS-Level Path MTU
+Querying (Linux)</h3>
+<p>On Linux systems, the kernel can perform Path MTU Discovery
+automatically. You can configure a UDP socket to enforce MTU discovery
+and then retrieve the determined Path MTU (PMTU) directly from the
+kernel routing cache.</p>
+<ol type="1">
+<li><p><strong>Enable PMTUD on the Socket:</strong> Set the
+<code>IP_MTU_DISCOVER</code> socket option with the
+<code>IP_PMTUDISC_DO</code> flag (to strictly prevent fragmentation) or
+<code>IP_PMTUDISC_PROBE</code> (to allow sending packets larger than the
+current PMTU for probing purposes).</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> val <span class="op">=</span> IP_PMTUDISC_DO<span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>setsockopt<span class="op">(</span>sockfd<span class="op">,</span> IPPROTO_IP<span class="op">,</span> IP_MTU_DISCOVER<span class="op">,</span> <span class="op">&amp;</span>val<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>val<span class="op">));</span></span></code></pre></div></li>
+<li><p><strong>Query the Current Path MTU:</strong> After establishing a
+connection or sending packets to the destination, retrieve the current
+MTU using <code>getsockopt</code> with <code>IP_MTU</code>.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> mtu<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>socklen_t len <span class="op">=</span> <span class="kw">sizeof</span><span class="op">(</span>mtu<span class="op">);</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>getsockopt<span class="op">(</span>sockfd<span class="op">,</span> IPPROTO_IP<span class="op">,</span> IP_MTU<span class="op">,</span> <span class="op">&amp;</span>mtu<span class="op">,</span> <span class="op">&amp;</span>len<span class="op">);</span></span></code></pre></div></li>
+<li><p><strong>Calculate Usable Payload Size:</strong> Subtract the
+protocol headers from the retrieved MTU value:</p>
+<ul>
+<li><strong>IPv4 Header:</strong> 20 bytes (minimum)</li>
+<li><strong>UDP Header:</strong> 8 bytes</li>
+<li><strong>Max UDP Payload:</strong> <code>MTU - 28 bytes</code> (for
+standard IPv4)</li>
+</ul></li>
+</ol>
+<h3 id="2-windows-ip-helper-api-and-socket-options">2. Windows IP Helper
+API and Socket Options</h3>
+<p>On Windows, Path MTU can be determined via the IP Helper API or by
+configuring the socket to prevent fragmentation:</p>
+<ol type="1">
+<li><p><strong>Set Don't Fragment (DF) Flag:</strong> Use
+<code>setsockopt</code> with <code>IP_DONTFRAGMENT</code> to ensure that
+packets exceeding the path MTU trigger an error rather than
+fragmenting.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>DWORD val <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>setsockopt<span class="op">(</span>sockfd<span class="op">,</span> IPPROTO_IP<span class="op">,</span> IP_DONTFRAGMENT<span class="op">,</span> <span class="op">(</span><span class="dt">const</span> <span class="dt">char</span><span class="op">*)&amp;</span>val<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>val<span class="op">));</span></span></code></pre></div></li>
+<li><p><strong>Query Network Path Information:</strong> Use the
+<code>GetIpPathEntry</code> function from the IP Helper library
+(<code>Netioapi.h</code>). Initialize a <code>MIB_IPPATH_ROW</code>
+structure with the destination IP address, and inspect the
+<code>PathMtu</code> field returned by the system.</p></li>
+</ol>
+<h3 id="3-application-level-probing-plpmtud---rfc-8899">3.
+Application-Level Probing (PLPMTUD - RFC 8899)</h3>
+<p>Traditional ICMP-based PMTUD frequently fails when firewalls and
+routers drop ICMP "Fragmentation Needed" (Type 3, Code 4) messages,
+leading to PMTU black holes. Implementing Packetization Layer Path MTU
+Discovery (PLPMTUD) inside your application protocol is the most robust
+approach:</p>
+<ol type="1">
+<li><strong>Set the DF Bit:</strong> Ensure all UDP probe packets have
+the "Don't Fragment" flag enabled at the socket level.</li>
+<li><strong>Implement Binary Search Probing:</strong>
+<ul>
+<li>Start with a baseline size (typically 1280 bytes for IPv6 or 1472
+bytes for standard Ethernet IPv4).</li>
+<li>Send probe packets with incremental payload sizes to the
+receiver.</li>
+<li>Require the receiving application to acknowledge (ACK) probe
+packets.</li>
+</ul></li>
+<li><strong>Handle Timeouts and Adjust:</strong>
+<ul>
+<li>If a probe is acknowledged, increase the probe size.</li>
+<li>If a probe is unacknowledged within a timeout window, reduce the
+target size using a binary search algorithm between the last known
+working size and the failed size.</li>
+</ul></li>
+<li><strong>Periodic Verification:</strong> Periodically re-probe the
+path to detect route changes that increase or decrease the MTU.</li>
+</ol>
+<h3 id="4-safe-default-fallbacks">4. Safe Default Fallbacks</h3>
+<p>If path discovery cannot be performed or has not yet completed:</p>
+<ul>
+<li><strong>IPv4 Minimum Safe Payload:</strong> <strong>548
+bytes</strong> (576-byte minimum IPv4 reassembly buffer minus 20-byte IP
+header and 8-byte UDP header).</li>
+<li><strong>IPv6 Minimum Safe Payload:</strong> <strong>1232
+bytes</strong> (1280-byte minimum IPv6 MTU minus 40-byte IPv6 header and
+8-byte UDP header).</li>
+<li><strong>Standard Internet UDP Payload:</strong> <strong>1200–1232
+bytes</strong> is the standard default used by modern protocols like
+QUIC and DNS to avoid fragmentation across almost all Internet
+routes.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDP Traffic Latency in Cellular vs Wired Networks - udp</title>
+    <meta name="description" content="While wired networks deliver User Datagram Protocol (UDP) packets across dedicated physical links with consistent, sub-millisecond propagation, cellular networks (4G/5G) must negotiate a dynamic radio environment where scheduling, radio link error correc">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/udp-traffic-latency-in-cellular-vs-wired-networks">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="UDP Traffic Latency in Cellular vs Wired Networks - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/udp-traffic-latency-in-cellular-vs-wired-networks" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="While wired networks deliver User Datagram Protocol (UDP) packets across dedicated physical links with consistent, sub-millisecond propagation, cellular networks (4G/5G) must negotiate a dynamic radio environment where scheduling, radio link error correc" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="udp-traffic-latency-in-cellular-vs-wired-networks">UDP Traffic
+Latency in Cellular vs Wired Networks</h1>
+<p>While wired networks deliver User Datagram Protocol (UDP) packets
+across dedicated physical links with consistent, sub-millisecond
+propagation, cellular networks (4G/5G) must negotiate a dynamic radio
+environment where scheduling, radio link error correction, and variable
+channel conditions introduce unique latency characteristics.
+Understanding these differences requires examining how transmission
+mediums, scheduling architectures, lower-layer retransmission protocols,
+and buffer management strategies fundamentally alter the path of
+connectionless data.</p>
+<h3 id="1-transmission-medium-and-air-interface-constraints">1.
+Transmission Medium and Air Interface Constraints</h3>
+<p>Wired networks transmit UDP packets over copper or fiber optic
+cables. In this environment, signal degradation is predictable, packet
+loss rates are exceptionally low, and transmission delay is essentially
+governed by the speed of light in the physical medium combined with
+hardware switching speed.</p>
+<p>Cellular networks utilize radio frequency (RF) bands. Factors like
+distance from base stations, physical obstructions, multipath fading,
+and atmospheric interference cause dynamic variations in signal quality.
+This unpredictable channel requires cellular networks to use complex
+modulation schemes (QAM) and dynamic rate adaptation, introducing
+variable physical layer delays that do not exist in fixed lines.</p>
+<h3 id="2-uplink-scheduling-and-grants">2. Uplink Scheduling and
+Grants</h3>
+<p>On a wired network, a network interface card (NIC) can transmit a UDP
+frame almost instantly if the physical medium is idle.</p>
+<p>In 4G LTE and standard 5G networks, the process requires explicit
+coordination:</p>
+<ul>
+<li><strong>Scheduling Request (SR):</strong> The user equipment (UE)
+cannot simply transmit data. It must first send a scheduling request to
+the base station (eNodeB in 4G, gNodeB in 5G) over a dedicated control
+channel.</li>
+<li><strong>Uplink Grant:</strong> The base station processes the
+request, evaluates available radio resources among all connected
+devices, and sends back an uplink grant defining when and on which
+frequencies the device can transmit.</li>
+<li><strong>Transmission:</strong> The device finally transmits the UDP
+payload.</li>
+</ul>
+<p>This grant-request handshake introduces an inherent baseline latency
+floor (often 5–15 ms in LTE) before a single UDP packet leaves the
+device. 5G reduces this delay through configured grants (grant-free
+transmission) and flexible numerology, but it remains structurally more
+complex than wired direct transmission.</p>
+<h3 id="3-layer-2-retransmissions-harq-and-rlc">3. Layer 2
+Retransmissions: HARQ and RLC</h3>
+<p>UDP is inherently an unreliable, connectionless transport protocol
+with no built-in acknowledgment or retransmission mechanism at Layer
+4.</p>
+<ul>
+<li><strong>Wired Networks:</strong> If a router or switch drops a UDP
+packet due to congestion or link degradation, the packet is simply lost.
+This preserves real-time delivery at the expense of data
+completeness.</li>
+<li><strong>Cellular Networks:</strong> Because the wireless interface
+is naturally error-prone, cellular architectures implement lower-layer
+recovery mechanisms: <strong>Hybrid Automatic Repeat Request
+(HARQ)</strong> at the MAC layer and <strong>Automatic Repeat Request
+(ARQ)</strong> at the Radio Link Control (RLC) layer. If a radio block
+carrying UDP data fails to decode, the base station or UE attempts rapid
+Layer 2 retransmissions.</li>
+</ul>
+<p>As a result, cellular UDP traffic experiences sudden latency jitter
+instead of immediate packet drops. While reliability over the air
+improves, time-sensitive applications (such as cloud gaming or voice
+calls) may receive delayed UDP packets that are no longer useful.</p>
+<h3 id="4-bufferbloat-and-radio-resource-queueing">4. Bufferbloat and
+Radio Resource Queueing</h3>
+<p>Wired network routers typically employ active queue management (AQM)
+like CoDel or RED to minimize packet buildup during congestion.</p>
+<p>In cellular networks, base stations maintain large data buffers to
+ensure smooth throughput when channel conditions temporarily drop (e.g.,
+when a user walks behind a concrete wall). When high-rate UDP streams
+encounter a degraded RF link, these buffers fill rapidly. The resulting
+bufferbloat causes dramatic latency spikes, converting milliseconds of
+delay into hundreds of milliseconds until radio conditions recover or
+packets time out.</p>
+<h3 id="5-core-network-routing-and-edge-proximity">5. Core Network
+Routing and Edge Proximity</h3>
+<p>Wired networks generally benefit from direct, topologically optimized
+routing paths to internet service providers and content distribution
+nodes.</p>
+<p>Cellular networks tunnel user traffic from the base station through a
+centralized core network (the Evolved Packet Core in 4G or 5G Core) via
+protocols like GTP-U (GPRS Tunnelling Protocol User Plane). This
+encapsulation and routing backhaul can add detour routing latency if the
+user plane gateway is geographically distant.</p>
+<p>5G mitigates this through User Plane Function (UPF) distribution and
+Multi-access Edge Computing (MEC), allowing UDP packets to be processed
+closer to the base station, narrowing the architectural latency gap with
+wired fiber networks.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

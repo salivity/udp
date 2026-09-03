@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Web Browsers Use TCP Instead of UDP for HTML - udp</title>
+    <meta name="description" content="Web browsers traditionally rely on the Transmission Control Protocol (TCP) rather than the User Datagram Protocol (UDP) to fetch HTML documents because web pages require strict data reliability and correct packet ordering. Unlike media streaming where mi">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/why-web-browsers-use-tcp-instead-of-udp-for-html">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why Web Browsers Use TCP Instead of UDP for HTML - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/why-web-browsers-use-tcp-instead-of-udp-for-html" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Web browsers traditionally rely on the Transmission Control Protocol (TCP) rather than the User Datagram Protocol (UDP) to fetch HTML documents because web pages require strict data reliability and correct packet ordering. Unlike media streaming where mi" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="why-web-browsers-use-tcp-instead-of-udp-for-html">Why Web
+Browsers Use TCP Instead of UDP for HTML</h1>
+<p>Web browsers traditionally rely on the Transmission Control Protocol
+(TCP) rather than the User Datagram Protocol (UDP) to fetch HTML
+documents because web pages require strict data reliability and correct
+packet ordering. Unlike media streaming where minor data loss is
+acceptable, loading a web page demands that every single byte of text,
+markup, and script arrives intact and in sequence. This article explains
+the technical reasons TCP was chosen for web delivery, focusing on
+reliability, ordering, error checking, and modern evolutions.</p>
+<h3 id="guaranteed-delivery-and-packet-loss">Guaranteed Delivery and
+Packet Loss</h3>
+<p>TCP is a connection-oriented protocol that guarantees data delivery
+through acknowledgments and retransmissions. If a network packet is
+dropped along the route, TCP automatically detects the missing packet
+and re-sends it. In contrast, UDP is connectionless and does not verify
+whether data reaches the destination. When loading an HTML document,
+even a small amount of lost data can corrupt the page structure, break
+JavaScript execution, or leave the document unreadable.</p>
+<h3 id="ordered-data-stream">Ordered Data Stream</h3>
+<p>HTML files are parsed sequentially by the browser engine to construct
+the Document Object Model (DOM). TCP assigns sequence numbers to all
+outgoing packets, allowing the receiving browser to reassemble the data
+in the exact order it was transmitted. UDP does not track packet
+sequence, meaning packets can arrive out of order or duplicated, which
+would severely disrupt the linear parsing process required for web
+content.</p>
+<h3 id="error-detection-and-data-integrity">Error Detection and Data
+Integrity</h3>
+<p>TCP incorporates extensive error-checking mechanisms. Every packet
+includes a checksum to detect data corruption during transit. If
+corruption occurs, TCP discards the damaged packet and requests a fresh
+copy. UDP provides only basic checksum capability and lacks built-in
+mechanisms to recover corrupted data automatically.</p>
+<h3 id="flow-and-congestion-control">Flow and Congestion Control</h3>
+<p>TCP includes built-in flow control and congestion control algorithms
+that regulate data transmission rates based on current network
+conditions and the receiver’s processing capacity. This prevents a fast
+web server from overwhelming a slower client device or congesting the
+broader network. UDP transmits data without regard to network congestion
+or receiver readiness, increasing the likelihood of packet drops under
+heavy load.</p>
+<h3 id="the-evolution-to-http3-and-quic">The Evolution to HTTP/3 and
+QUIC</h3>
+<p>While standard TCP has been the default transport layer for HTTP/1.1
+and HTTP/2, modern web standards have introduced HTTP/3, which runs on
+top of UDP via a protocol called QUIC. However, QUIC does not abandon
+TCP's guarantees; instead, it reimplements reliability, congestion
+control, and packet ordering directly on top of UDP at the user space
+level to avoid the connection-establishment delays and head-of-line
+blocking associated with traditional TCP.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

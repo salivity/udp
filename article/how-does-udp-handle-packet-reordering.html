@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Does UDP Handle Packet Reordering? - udp</title>
+    <meta name="description" content="The User Datagram Protocol (UDP) is a lightweight, connectionless transport-layer protocol designed to optimize transmission speed and minimize latency. This article explains how UDP processes packet reordering on the receiving end, why the protocol itse">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-does-udp-handle-packet-reordering">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Does UDP Handle Packet Reordering? - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-does-udp-handle-packet-reordering" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The User Datagram Protocol (UDP) is a lightweight, connectionless transport-layer protocol designed to optimize transmission speed and minimize latency. This article explains how UDP processes packet reordering on the receiving end, why the protocol itse" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-does-udp-handle-packet-reordering">How Does UDP Handle
+Packet Reordering?</h1>
+<p>The User Datagram Protocol (UDP) is a lightweight, connectionless
+transport-layer protocol designed to optimize transmission speed and
+minimize latency. This article explains how UDP processes packet
+reordering on the receiving end, why the protocol itself does not
+correct out-of-sequence datagrams, and how application-layer mechanisms
+step in when packet order is essential.</p>
+<h2 id="native-udp-behavior-no-inherent-reordering">Native UDP Behavior:
+No Inherent Reordering</h2>
+<p>At the transport layer, UDP does not handle packet reordering at all.
+When UDP datagrams traverse the internet, different packets may take
+different physical routes, experience varying queue delays, or encounter
+network congestion. As a result, a sequence of packets sent as 1, 2, and
+3 may arrive at the destination network interface as 2, 1, and 3.</p>
+<p>UDP lacks the architectural features necessary to detect or fix this
+scenario:</p>
+<ul>
+<li><strong>No Sequence Numbers:</strong> The standard 8-byte UDP header
+contains only four fields: Source Port, Destination Port, Length, and
+Checksum. Because there are no sequence or acknowledgment numbers, the
+receiving UDP stack cannot determine the original order of the incoming
+datagrams.</li>
+<li><strong>Immediate Delivery:</strong> As soon as the receiving
+operating system verifies the checksum (if enabled), it immediately
+places the datagram into the receiving socket buffer. UDP passes the
+packets up to the application in the exact order they arrive, regardless
+of whether they are out of sequence.</li>
+</ul>
+<h2 id="how-applications-handle-reordered-packets">How Applications
+Handle Reordered Packets</h2>
+<p>Because UDP operates on a "fire-and-forget" basis, the responsibility
+for managing out-of-order packets shifts entirely to the application
+layer. Depending on the use case, applications implement several
+strategies:</p>
+<h3 id="1-application-level-sequence-numbers">1. Application-Level
+Sequence Numbers</h3>
+<p>Developers using UDP for custom protocols (or standardized protocols
+like RTP - Real-time Transport Protocol) embed sequence numbers or
+timestamps directly into the payload data. When the receiving
+application reads datagrams from the UDP socket, it inspects these
+custom headers to evaluate packet order.</p>
+<h3 id="2-jitter-and-reordering-buffers">2. Jitter and Reordering
+Buffers</h3>
+<p>For real-time streaming, voice over IP (VoIP), or video conferencing,
+receiving applications utilize a jitter buffer. The application holds
+incoming packets temporarily in memory, sorts them according to their
+embedded sequence numbers, and plays them out smoothly.</p>
+<h3 id="3-discarding-out-of-order-packets">3. Discarding Out-of-Order
+Packets</h3>
+<p>In fast-paced environments like online multiplayer gaming or live
+telemetry, stale data is often useless. If a packet arrives out of order
+and newer state information has already been processed, the application
+simply discards the late datagram rather than attempting to reorder
+it.</p>
+<h3 id="4-custom-reliability-and-selective-retransmission">4. Custom
+Reliability and Selective Retransmission</h3>
+<p>When an application requires both UDP's speed and TCP's reliability,
+protocols built on top of UDP (such as QUIC, WebRTC, or custom
+game-engine protocols) manage sequence tracking, acknowledgment, and
+selective retransmission logic entirely within the application code.</p>
+<p>UDP does not manage packet reordering on the receiving end; it simply
+passes datagrams to the receiving application as they arrive, leaving
+all sequence validation and buffer management to the software consuming
+the data.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

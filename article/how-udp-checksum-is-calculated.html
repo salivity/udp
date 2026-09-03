@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How UDP Checksum Is Calculated - udp</title>
+    <meta name="description" content="The User Datagram Protocol (UDP) checksum is a 16-bit error-detection mechanism used to verify the integrity of transmitted data across the transport and network layers. This article explains the exact step-by-step algorithm used to calculate the UDP che">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-udp-checksum-is-calculated">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How UDP Checksum Is Calculated - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-udp-checksum-is-calculated" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The User Datagram Protocol (UDP) checksum is a 16-bit error-detection mechanism used to verify the integrity of transmitted data across the transport and network layers. This article explains the exact step-by-step algorithm used to calculate the UDP che" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-udp-checksum-is-calculated">How UDP Checksum Is
+Calculated</h1>
+<p>The User Datagram Protocol (UDP) checksum is a 16-bit error-detection
+mechanism used to verify the integrity of transmitted data across the
+transport and network layers. This article explains the exact
+step-by-step algorithm used to calculate the UDP checksum, including the
+creation of the IPv4/IPv6 pseudo-header, 16-bit word alignment, one's
+complement summation, and receiver verification.</p>
+<hr />
+<h3 id="the-three-components-of-the-checksum">The Three Components of
+the Checksum</h3>
+<p>Unlike simpler checksums that only evaluate the payload, the UDP
+checksum covers three distinct data blocks:</p>
+<ol type="1">
+<li><strong>The UDP Pseudo-Header:</strong> A synthetic header
+constructed from fields in the IP layer to ensure the packet was routed
+to the correct destination IP and protocol.</li>
+<li><strong>The UDP Header:</strong> Source Port, Destination Port,
+Length, and the Checksum field itself.</li>
+<li><strong>The Data Payload:</strong> The actual application-layer data
+being transmitted.</li>
+</ol>
+<hr />
+<h3 id="step-by-step-calculation-process">Step-by-Step Calculation
+Process</h3>
+<h4 id="step-1-construct-the-pseudo-header">Step 1: Construct the
+Pseudo-Header</h4>
+<p>For an IPv4 packet, a 12-byte pseudo-header is generated using:</p>
+<ul>
+<li><strong>Source IPv4 Address</strong> (32 bits)</li>
+<li><strong>Destination IPv4 Address</strong> (32 bits)</li>
+<li><strong>Zero Padding</strong> (8 bits set to <code>0x00</code>)</li>
+<li><strong>Protocol Number</strong> (8 bits set to <code>17</code> or
+<code>0x11</code> for UDP)</li>
+<li><strong>UDP Length</strong> (16 bits, matching the length in the UDP
+header)</li>
+</ul>
+<p><em>(For IPv6, the pseudo-header is 40 bytes long, containing 128-bit
+source and destination addresses, a 32-bit UDP length, and a "Next
+Header" field set to 17).</em></p>
+<h4 id="step-2-prepare-the-udp-header">Step 2: Prepare the UDP
+Header</h4>
+<p>Place the standard 8-byte UDP header immediately after the
+pseudo-header. Set the 16-bit <strong>Checksum</strong> field in the
+header to <code>0x0000</code> for the calculation.</p>
+<h4 id="step-3-append-the-payload-and-apply-padding">Step 3: Append the
+Payload and Apply Padding</h4>
+<p>Append the application data directly after the UDP header. If the
+payload contains an odd number of octets (bytes), append a single zero
+byte (<code>0x00</code>) to the end to align the entire buffer to 16-bit
+(2-byte) boundaries. This padding byte is only used for calculation and
+is not transmitted.</p>
+<h4 id="step-4-perform-ones-complement-addition">Step 4: Perform One's
+Complement Addition</h4>
+<p>Divide the entire concatenated buffer (Pseudo-Header + UDP Header +
+Payload + Padding) into 16-bit words. Add these words together using
+<strong>one's complement addition</strong>:</p>
+<ol type="1">
+<li>Add all 16-bit words using standard 32-bit integer addition.</li>
+<li>If the resulting sum exceeds 16 bits (producing a carry value in the
+upper 16 bits), add the carry bits back into the lower 16 bits: <span
+class="math display">\[\text{Sum} = (\text{Sum} \ \&amp; \
+\text{0xFFFF}) + (\text{Sum} \gg 16)\]</span></li>
+<li>Repeat the carry addition if another overflow occurs, until the
+upper 16 bits equal zero.</li>
+</ol>
+<h4 id="step-5-invert-the-final-result">Step 5: Invert the Final
+Result</h4>
+<p>Take the one's complement (bitwise NOT) of the final 16-bit sum:</p>
+<p><span class="math display">\[\text{Checksum} =
+\sim\text{Sum}\]</span></p>
+<p>Place this 16-bit value into the UDP header's Checksum field.</p>
+<hr />
+<h3 id="special-handling-and-rules">Special Handling and Rules</h3>
+<ul>
+<li><strong>All Zeros vs. All Ones:</strong> In one's complement
+arithmetic, <code>0x0000</code> (positive zero) and <code>0xFFFF</code>
+(negative zero) are equivalent. If the calculated checksum evaluates to
+<code>0x0000</code>, it is transmitted as <code>0xFFFF</code>. In IPv4,
+a transmitted checksum of <code>0x0000</code> indicates that the
+checksum was disabled and not calculated.</li>
+<li><strong>Mandatory in IPv6:</strong> While UDP checksums are optional
+in IPv4, they are strictly mandatory in IPv6 because the IPv6 base
+header lacks its own header checksum.</li>
+</ul>
+<hr />
+<h3 id="receiver-verification">Receiver Verification</h3>
+<p>When the destination host receives the datagram, it constructs the
+same pseudo-header and adds all 16-bit words together, including the
+received checksum value in the UDP header.</p>
+<p>If no transmission errors occurred, the resulting one's complement
+sum will evaluate to <code>0xFFFF</code> (or <code>0x0000</code> after
+inversion). Any other result indicates packet corruption, causing the
+receiving stack to discard the datagram.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

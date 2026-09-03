@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Disadvantages of UDP Explained - udp</title>
+    <meta name="description" content="User Datagram Protocol (UDP) is a core communication protocol widely used for time-sensitive applications like video streaming, gaming, and VoIP due to its low-latency design. However, UDP achieves its high transmission speed by eliminating the reliabili">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/main-disadvantages-of-udp-explained">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Main Disadvantages of UDP Explained - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/main-disadvantages-of-udp-explained" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="User Datagram Protocol (UDP) is a core communication protocol widely used for time-sensitive applications like video streaming, gaming, and VoIP due to its low-latency design. However, UDP achieves its high transmission speed by eliminating the reliabili" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="main-disadvantages-of-udp-explained">Main Disadvantages of UDP
+Explained</h1>
+<p>User Datagram Protocol (UDP) is a core communication protocol widely
+used for time-sensitive applications like video streaming, gaming, and
+VoIP due to its low-latency design. However, UDP achieves its high
+transmission speed by eliminating the reliability mechanisms built into
+protocols like Transmission Control Protocol (TCP). As a result, UDP has
+significant limitations, including a complete lack of packet delivery
+guarantees, no inherent ordering, absence of flow and congestion
+control, and heightened security vulnerabilities.</p>
+<h3 id="1-no-guaranteed-packet-delivery-lack-of-reliability">1. No
+Guaranteed Packet Delivery (Lack of Reliability)</h3>
+<p>UDP is an inherently unreliable, "best-effort" protocol. Unlike TCP,
+UDP does not perform handshakes to establish connections and does not
+send acknowledgment (ACK) packets when data is received. If network
+congestion or hardware issues cause datagrams to drop along the route,
+UDP does not retransmit the missing data.</p>
+<h3 id="2-no-packet-ordering">2. No Packet Ordering</h3>
+<p>Packets sent over a network may take different routing paths,
+resulting in them arriving out of sequence. UDP does not track packet
+sequences or reorder datagrams upon arrival. If an application requires
+data in a strict chronological sequence, the application layer must
+independently manage sequencing, buffering, and reassembly.</p>
+<h3 id="3-lack-of-congestion-control">3. Lack of Congestion Control</h3>
+<p>UDP transmits data at whatever rate the application generates it,
+regardless of network conditions. It lacks mechanisms to detect network
+congestion or automatically throttle data rates. Consequently,
+high-volume UDP traffic can exacerbate network bottlenecks and cause
+severe packet loss across the entire network path.</p>
+<h3 id="4-absence-of-flow-control">4. Absence of Flow Control</h3>
+<p>Flow control prevents a fast sender from overwhelming a slow
+receiver. UDP does not monitor the receiver’s buffer status or adjust
+transmission speed dynamically. If the sender pushes data faster than
+the receiving machine can process, the receiver simply drops the excess
+datagrams without notifying the sender.</p>
+<h3 id="5-basic-and-limited-error-handling">5. Basic and Limited Error
+Handling</h3>
+<p>While UDP includes an optional 16-bit checksum to detect data
+corruption, its error recovery is minimal. If a UDP checksum detects
+corrupted data within a datagram, the operating system quietly discards
+the packet. There is no mechanism to request a replacement or notify the
+sending host that an error occurred.</p>
+<h3 id="6-vulnerability-to-network-attacks">6. Vulnerability to Network
+Attacks</h3>
+<p>Because UDP is connectionless and does not validate source IP
+addresses through a handshake, it is frequently exploited for malicious
+traffic. Attackers commonly use UDP for Denial-of-Service (DoS) attacks,
+such as UDP floods and DNS/NTP amplification attacks, where spoofed
+source addresses overwhelm target networks with unsolicited traffic.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

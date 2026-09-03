@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maximum Theoretical Size of a UDP Datagram - udp</title>
+    <meta name="description" content="The maximum theoretical size of a standard IPv4 UDP datagram is 65,535 bytes in total, resulting in a maximum theoretical payload size of 65,507 bytes after subtracting the necessary headers. However, this limit depends on the underlying Internet Protoco">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/maximum-theoretical-size-of-a-udp-datagram">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Maximum Theoretical Size of a UDP Datagram - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/maximum-theoretical-size-of-a-udp-datagram" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The maximum theoretical size of a standard IPv4 UDP datagram is 65,535 bytes in total, resulting in a maximum theoretical payload size of 65,507 bytes after subtracting the necessary headers. However, this limit depends on the underlying Internet Protoco" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="maximum-theoretical-size-of-a-udp-datagram">Maximum Theoretical
+Size of a UDP Datagram</h1>
+<p>The maximum theoretical size of a standard IPv4 UDP datagram is
+65,535 bytes in total, resulting in a maximum theoretical payload size
+of 65,507 bytes after subtracting the necessary headers. However, this
+limit depends on the underlying Internet Protocol (IP) version used, and
+special protocol extensions like IPv6 Jumbograms can theoretically
+expand this capacity to over 4 gigabytes. This article breaks down the
+mathematical limits of UDP datagram sizes across standard IPv4, IPv6,
+and practical networking environments.</p>
+<h2 id="the-ipv4-udp-limit-65507-bytes">The IPv4 UDP Limit (65,507
+Bytes)</h2>
+<p>UDP itself defines a 16-bit <code>Length</code> field in its header.
+A 16-bit unsigned integer can represent values from 0 to 65,535 (<span
+class="math inline">\(2^{16} - 1\)</span>). This means a UDP datagram
+(header plus payload) cannot exceed 65,535 bytes.</p>
+<p>Furthermore, an IPv4 packet also uses a 16-bit
+<code>Total Length</code> field, capping the entire packet (IPv4 header
++ UDP header + UDP data) at 65,535 bytes.</p>
+<p>To determine the maximum theoretical payload (user data) for UDP over
+IPv4:</p>
+<ul>
+<li><strong>Maximum IPv4 Total Length:</strong> 65,535 bytes</li>
+<li><strong>Minimum IPv4 Header:</strong> 20 bytes (without
+options)</li>
+<li><strong>UDP Header:</strong> 8 bytes</li>
+</ul>
+<p><span class="math display">\[\text{Maximum Payload} = 65,535 - 20 - 8
+= 65,507 \text{ bytes}\]</span></p>
+<p>If the IPv4 header contains optional fields (up to 60 bytes total),
+the available UDP payload size decreases accordingly.</p>
+<h2 id="the-ipv6-udp-limit-65487-bytes">The IPv6 UDP Limit (65,487
+Bytes)</h2>
+<p>In standard IPv6 networks:</p>
+<ul>
+<li>The standard IPv6 <code>Payload Length</code> field is also 16 bits,
+allowing a maximum payload of 65,535 bytes.</li>
+<li>The fixed IPv6 base header is 40 bytes (handled separately from the
+payload length).</li>
+<li>The UDP header is 8 bytes.</li>
+</ul>
+<p><span class="math display">\[\text{Maximum Standard IPv6 Payload} =
+65,535 - 8 = 65,527 \text{ bytes}\]</span></p>
+<p>However, accounting for the total IP packet limitation under standard
+frame constraints, the theoretical UDP data limit is:</p>
+<p><span class="math display">\[\text{Maximum Data} = 65,535 - 40 - 8 =
+65,487 \text{ bytes}\]</span></p>
+<h2 id="ipv6-jumbograms-up-to-4-gigabytes">IPv6 Jumbograms (Up to 4
+Gigabytes)</h2>
+<p>Under RFC 2675, IPv6 supports an extension called
+<strong>Jumbograms</strong>.</p>
+<p>When using Jumbograms:</p>
+<ul>
+<li>The 16-bit UDP <code>Length</code> field is set to <code>0</code>,
+signaling to the operating system and network stack that the length
+exceeds standard 16-bit limits.</li>
+<li>The actual length is stored in a 32-bit IPv6 Jumbo Payload option
+field.</li>
+<li>This allows a theoretical maximum UDP packet size of <span
+class="math inline">\(2^{32} - 1\)</span> bytes (4,294,967,295 bytes or
+approximately 4 GB), leaving <strong>4,294,967,247 bytes</strong> for
+the payload after subtracting the 40-byte IPv6 header and 8-byte UDP
+header.</li>
+</ul>
+<h2 id="theoretical-vs-practical-limits">Theoretical vs. Practical
+Limits</h2>
+<p>While 65,507 bytes is the theoretical maximum for IPv4:</p>
+<ul>
+<li><strong>Maximum Transmission Unit (MTU):</strong> Most standard
+Ethernet networks use an MTU of 1,500 bytes.</li>
+<li><strong>Fragmentation:</strong> Any UDP datagram larger than the MTU
+minus IP/UDP headers (typically 1,472 bytes in IPv4) must be fragmented
+into multiple IP packets.</li>
+<li><strong>Reliability:</strong> If any single fragment of a fragmented
+UDP packet is lost, the entire datagram is discarded by the receiver,
+because UDP does not support retransmission.</li>
+</ul>
+<p>For reliable, unfragmented transmission over the public internet,
+applications generally limit UDP payload sizes to <strong>1,472
+bytes</strong> (for IPv4) or <strong>1,280 bytes</strong> (the minimum
+MTU required by IPv6).</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

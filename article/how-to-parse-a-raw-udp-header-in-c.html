@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Parse a Raw UDP Header in C - udp</title>
+    <meta name="description" content="Parsing a raw UDP header in C involves capturing a raw network packet buffer, identifying the byte offset where the UDP segment begins, and mapping that memory directly onto a standard UDP header structure. This guide explains the layout of a UDP header,">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-to-parse-a-raw-udp-header-in-c">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Parse a Raw UDP Header in C - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-to-parse-a-raw-udp-header-in-c" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Parsing a raw UDP header in C involves capturing a raw network packet buffer, identifying the byte offset where the UDP segment begins, and mapping that memory directly onto a standard UDP header structure. This guide explains the layout of a UDP header," />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-parse-a-raw-udp-header-in-c">How to Parse a Raw UDP
+Header in C</h1>
+<p>Parsing a raw UDP header in C involves capturing a raw network packet
+buffer, identifying the byte offset where the UDP segment begins, and
+mapping that memory directly onto a standard UDP header structure. This
+guide explains the layout of a UDP header, how to map binary packet data
+into C structures, handle endianness conversions, and access fields such
+as source and destination ports, payload length, and checksums.</p>
+<h2 id="the-udp-header-structure">The UDP Header Structure</h2>
+<p>The User Datagram Protocol (UDP) header is fixed at 8 bytes (64 bits)
+in length and consists of four 16-bit fields:</p>
+<ol type="1">
+<li><strong>Source Port (16 bits):</strong> Port number of the
+sender.</li>
+<li><strong>Destination Port (16 bits):</strong> Port number of the
+receiver.</li>
+<li><strong>Length (16 bits):</strong> Total length of the UDP header
+plus payload in bytes (minimum 8 bytes).</li>
+<li><strong>Checksum (16 bits):</strong> Error-checking field covering
+the header, payload, and an IP pseudo-header.</li>
+</ol>
+<h2 id="defining-the-udp-header-in-c">Defining the UDP Header in C</h2>
+<p>Standard Linux and Unix environments provide predefined structures in
+<code>&lt;netinet/udp.h&gt;</code>. The standard structure is
+<code>struct udphdr</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;netinet/udp.h&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">struct udphdr {</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">    u_int16_t uh_sport; // Source port</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    u_int16_t uh_dport; // Destination port</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    u_int16_t uh_ulen;  // UDP length</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">    u_int16_t uh_sum;   // Checksum</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">};</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span></code></pre></div>
+<p>Alternatively, you can define a custom packed structure:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdint.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> custom_udphdr <span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> source_port<span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> dest_port<span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> length<span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> checksum<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> __attribute__<span class="op">((</span>packed<span class="op">));</span></span></code></pre></div>
+<h2 id="parsing-the-header-from-a-raw-buffer">Parsing the Header from a
+Raw Buffer</h2>
+<p>When receiving packets via raw sockets
+(<code>AF_INET, SOCK_RAW, IPPROTO_UDP</code> or <code>AF_PACKET</code>),
+the raw buffer contains lower-layer protocol headers (like Ethernet and
+IPv4) preceding the UDP header.</p>
+<p>To reach the UDP header:</p>
+<ol type="1">
+<li>Extract the IP header to determine its length (using the
+<code>ihl</code> field).</li>
+<li>Offset the buffer pointer by the IP header size.</li>
+<li>Cast the resulting pointer to <code>struct udphdr *</code>.</li>
+<li>Convert 16-bit fields from Network Byte Order (Big Endian) to Host
+Byte Order using <code>ntohs()</code>.</li>
+</ol>
+<h2 id="complete-implementation">Complete Implementation</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdint.h&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;arpa/inet.h&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;netinet/ip.h&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;netinet/udp.h&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> parse_udp_packet<span class="op">(</span><span class="dt">const</span> <span class="dt">unsigned</span> <span class="dt">char</span> <span class="op">*</span>buffer<span class="op">,</span> <span class="dt">size_t</span> buffer_len<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>buffer_len <span class="op">&lt;</span> <span class="kw">sizeof</span><span class="op">(</span><span class="kw">struct</span> iphdr<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Packet too short to contain an IP header.</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 1. Parse the IPv4 Header</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="kw">struct</span> iphdr <span class="op">*</span>ip_header <span class="op">=</span> <span class="op">(</span><span class="dt">const</span> <span class="kw">struct</span> iphdr <span class="op">*)</span>buffer<span class="op">;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">size_t</span> ip_header_len <span class="op">=</span> ip_header<span class="op">-&gt;</span>ihl <span class="op">*</span> <span class="dv">4</span><span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>buffer_len <span class="op">&lt;</span> ip_header_len <span class="op">+</span> <span class="kw">sizeof</span><span class="op">(</span><span class="kw">struct</span> udphdr<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Packet too short to contain a UDP header.</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Ensure the protocol is UDP</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>ip_header<span class="op">-&gt;</span>protocol <span class="op">!=</span> IPPROTO_UDP<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Not a UDP packet.</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 2. Locate and Map the UDP Header</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="kw">struct</span> udphdr <span class="op">*</span>udp_header <span class="op">=</span> <span class="op">(</span><span class="dt">const</span> <span class="kw">struct</span> udphdr <span class="op">*)(</span>buffer <span class="op">+</span> ip_header_len<span class="op">);</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 3. Convert Byte Order and Extract Fields</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> src_port <span class="op">=</span> ntohs<span class="op">(</span>udp_header<span class="op">-&gt;</span>uh_sport<span class="op">);</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> dst_port <span class="op">=</span> ntohs<span class="op">(</span>udp_header<span class="op">-&gt;</span>uh_dport<span class="op">);</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> udp_len  <span class="op">=</span> ntohs<span class="op">(</span>udp_header<span class="op">-&gt;</span>uh_ulen<span class="op">);</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> checksum <span class="op">=</span> ntohs<span class="op">(</span>udp_header<span class="op">-&gt;</span>uh_sum<span class="op">);</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 4. Access the Payload</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">unsigned</span> <span class="dt">char</span> <span class="op">*</span>payload <span class="op">=</span> buffer <span class="op">+</span> ip_header_len <span class="op">+</span> <span class="kw">sizeof</span><span class="op">(</span><span class="kw">struct</span> udphdr<span class="op">);</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="dt">size_t</span> payload_len <span class="op">=</span> udp_len <span class="op">-</span> <span class="kw">sizeof</span><span class="op">(</span><span class="kw">struct</span> udphdr<span class="op">);</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Display Header Information</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;--- UDP Header ---</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Source Port:      </span><span class="sc">%u\n</span><span class="st">&quot;</span><span class="op">,</span> src_port<span class="op">);</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Destination Port: </span><span class="sc">%u\n</span><span class="st">&quot;</span><span class="op">,</span> dst_port<span class="op">);</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Length:           </span><span class="sc">%u</span><span class="st"> bytes</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> udp_len<span class="op">);</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Checksum:         0x</span><span class="sc">%04X\n</span><span class="st">&quot;</span><span class="op">,</span> checksum<span class="op">);</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Payload Size:     </span><span class="sc">%zu</span><span class="st"> bytes</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> payload_len<span class="op">);</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Simulated raw IP+UDP packet (IPv4 header + UDP header + 4-byte payload)</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="dt">unsigned</span> <span class="dt">char</span> raw_packet<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>        <span class="co">// IPv4 Header (20 bytes)</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        <span class="bn">0x45</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x20</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x01</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>        <span class="bn">0x40</span><span class="op">,</span> <span class="bn">0x11</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x7F</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x01</span><span class="op">,</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>        <span class="bn">0x7F</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x01</span><span class="op">,</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>        <span class="co">// UDP Header (8 bytes): SrcPort=8080, DstPort=9090, Len=12, Checksum=0x0000</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>        <span class="bn">0x1F</span><span class="op">,</span> <span class="bn">0x90</span><span class="op">,</span> <span class="bn">0x23</span><span class="op">,</span> <span class="bn">0x82</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x0C</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">,</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Payload (4 bytes: &quot;TEST&quot;)</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>        <span class="bn">0x54</span><span class="op">,</span> <span class="bn">0x45</span><span class="op">,</span> <span class="bn">0x53</span><span class="op">,</span> <span class="bn">0x54</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    parse_udp_packet<span class="op">(</span>raw_packet<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>raw_packet<span class="op">));</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="key-considerations">Key Considerations</h2>
+<ul>
+<li><strong>Byte Ordering:</strong> Network protocols transmit
+multi-byte integers in Big Endian format. Always use
+<code>ntohs()</code> for 16-bit integers and <code>ntohl()</code> for
+32-bit integers to prevent data corruption on Little Endian
+architectures (like x86/x64).</li>
+<li><strong>Buffer Bounds Checking:</strong> Always validate that the
+buffer size is large enough to contain both the IP header and the UDP
+header before dereferencing pointers to avoid segmentation faults or
+buffer over-reads.</li>
+<li><strong>Payload Offset:</strong> The UDP payload immediately follows
+the 8-byte UDP header. Calculate payload size by subtracting
+<code>sizeof(struct udphdr)</code> from
+<code>udp_header-&gt;uh_ulen</code>.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

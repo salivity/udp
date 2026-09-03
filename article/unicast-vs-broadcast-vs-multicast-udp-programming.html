@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicast vs Broadcast vs Multicast UDP Programming - udp</title>
+    <meta name="description" content="This article provides an overview of the core differences between unicast, broadcast, and multicast transmission methods in UDP network programming. It covers how each method operates conceptually, the specific socket configurations and socket options re">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/unicast-vs-broadcast-vs-multicast-udp-programming">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unicast vs Broadcast vs Multicast UDP Programming - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/unicast-vs-broadcast-vs-multicast-udp-programming" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article provides an overview of the core differences between unicast, broadcast, and multicast transmission methods in UDP network programming. It covers how each method operates conceptually, the specific socket configurations and socket options re" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="unicast-vs-broadcast-vs-multicast-udp-programming">Unicast vs
+Broadcast vs Multicast UDP Programming</h1>
+<p>This article provides an overview of the core differences between
+unicast, broadcast, and multicast transmission methods in UDP network
+programming. It covers how each method operates conceptually, the
+specific socket configurations and socket options required for
+implementation, and the practical scenarios where each approach is best
+utilized.</p>
+<h3 id="unicast-udp-programming">Unicast UDP Programming</h3>
+<p>Unicast is a one-to-one transmission method where data packets are
+sent from a single sender to a single designated receiver identified by
+a unique IP address.</p>
+<ul>
+<li><strong>Addressing:</strong> Uses standard Class A, B, or C IPv4
+addresses (or standard global IPv6 addresses).</li>
+<li><strong>Socket Implementation:</strong> Unicast is the default
+behavior for standard UDP sockets. The sender creates a socket and
+transmits data directly to the target IP and port using standard socket
+functions like <code>sendto()</code>. The receiver binds its socket to a
+specific port and reads data using <code>recvfrom()</code>. No special
+socket options are required.</li>
+<li><strong>Network Scope:</strong> Packets are routable across the
+local network and the public internet.</li>
+<li><strong>Use Cases:</strong> Direct communication such as DNS
+lookups, individual VoIP calls, and point-to-point gaming traffic.</li>
+</ul>
+<h3 id="broadcast-udp-programming">Broadcast UDP Programming</h3>
+<p>Broadcast is a one-to-all transmission method where a sender
+transmits a single packet that is delivered to every device on a local
+network segment.</p>
+<ul>
+<li><strong>Addressing:</strong> Uses a broadcast IP address, such as
+the local broadcast address (<code>255.255.255.255</code>) or a
+subnet-directed broadcast address (e.g.,
+<code>192.168.1.255</code>).</li>
+<li><strong>Socket Implementation:</strong> By default, operating
+systems prevent sockets from sending broadcast packets to prevent
+network flooding. To enable broadcasting, the sending application must
+explicitly set the <code>SO_BROADCAST</code> socket option using
+<code>setsockopt()</code>:
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> broadcastEnable <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>setsockopt<span class="op">(</span>socket_fd<span class="op">,</span> SOL_SOCKET<span class="op">,</span> SO_BROADCAST<span class="op">,</span> <span class="op">&amp;</span>broadcastEnable<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>broadcastEnable<span class="op">));</span></span></code></pre></div>
+Receiving nodes simply bind a UDP socket to the designated broadcast
+port and listen without needing any special socket options.</li>
+<li><strong>Network Scope:</strong> Broadcast traffic is confined to the
+local subnet. Routers do not forward broadcast packets across network
+boundaries to prevent broadcast storms.</li>
+<li><strong>Use Cases:</strong> Dynamic Host Configuration Protocol
+(DHCP), Address Resolution Protocol (ARP) discovery, and local device
+discovery.</li>
+</ul>
+<h3 id="multicast-udp-programming">Multicast UDP Programming</h3>
+<p>Multicast is a one-to-many transmission method where a sender
+transmits a packet once, and network infrastructure replicates it only
+to devices that have explicitly subscribed to that specific multicast
+group.</p>
+<ul>
+<li><strong>Addressing:</strong> Uses reserved Class D IPv4 addresses
+ranging from <code>224.0.0.0</code> to <code>239.255.255.255</code> (or
+<code>ff00::/8</code> in IPv6).</li>
+<li><strong>Socket Implementation:</strong> Senders can transmit to a
+multicast IP address just like a standard unicast address, though they
+can optionally configure <code>IP_MULTICAST_TTL</code> to control packet
+hop limits. Receivers, however, must actively join the multicast group
+by configuring the <code>IP_ADD_MEMBERSHIP</code> socket option using a
+<code>struct ip_mreq</code>:
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> ip_mreq mreq<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>mreq<span class="op">.</span>imr_multiaddr<span class="op">.</span>s_addr <span class="op">=</span> inet_addr<span class="op">(</span><span class="st">&quot;239.255.0.1&quot;</span><span class="op">);</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>mreq<span class="op">.</span>imr_interface<span class="op">.</span>s_addr <span class="op">=</span> htonl<span class="op">(</span>INADDR_ANY<span class="op">);</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>setsockopt<span class="op">(</span>socket_fd<span class="op">,</span> IPPROTO_IP<span class="op">,</span> IP_ADD_MEMBERSHIP<span class="op">,</span> <span class="op">&amp;</span>mreq<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>mreq<span class="op">));</span></span></code></pre></div></li>
+<li><strong>Network Scope:</strong> Multicast can travel across local
+subnets if intermediate routers support multicast routing protocols like
+IGMP (Internet Group Management Protocol) and PIM (Protocol Independent
+Multicast).</li>
+<li><strong>Use Cases:</strong> Live multimedia streaming (IPTV),
+real-time financial market data feeds, and distributed network
+synchronization.</li>
+</ul>
+<h3 id="key-differences-summary">Key Differences Summary</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Unicast</th>
+<th style="text-align: left;">Broadcast</th>
+<th style="text-align: left;">Multicast</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Communication Model</strong></td>
+<td style="text-align: left;">One-to-One</td>
+<td style="text-align: left;">One-to-All (Local Subnet)</td>
+<td style="text-align: left;">One-to-Many (Subscribers Only)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Target Address</strong></td>
+<td style="text-align: left;">Specific Host IP</td>
+<td style="text-align: left;">Broadcast IP
+(<code>255.255.255.255</code>)</td>
+<td style="text-align: left;">Multicast Group IP
+(<code>224.0.0.0/4</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sender Socket Option</strong></td>
+<td style="text-align: left;">None (Default)</td>
+<td style="text-align: left;"><code>SO_BROADCAST</code></td>
+<td style="text-align: left;">None (Optional:
+<code>IP_MULTICAST_TTL</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Receiver Socket
+Option</strong></td>
+<td style="text-align: left;">None (<code>bind()</code> only)</td>
+<td style="text-align: left;">None (<code>bind()</code> only)</td>
+<td style="text-align: left;"><code>IP_ADD_MEMBERSHIP</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Router Forwarding</strong></td>
+<td style="text-align: left;">Routed globally</td>
+<td style="text-align: left;">Blocked by routers</td>
+<td style="text-align: left;">Routed only with IGMP/PIM support</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Network Efficiency</strong></td>
+<td style="text-align: left;">Low for mass delivery</td>
+<td style="text-align: left;">Low (interrupts all hosts)</td>
+<td style="text-align: left;">High (optimized packet replication)</td>
+</tr>
+</tbody>
+</table></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

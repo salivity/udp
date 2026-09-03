@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact of CPU Cache Misses on UDP Packet Parsing - udp</title>
+    <meta name="description" content="High-throughput network applications rely heavily on rapid UDP packet processing, where the bottleneck is frequently memory access latency rather than computational capacity. When UDP packet parsing algorithms suffer from CPU cache misses, the CPU pipeli">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/impact-of-cpu-cache-misses-on-udp-packet-parsing">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Impact of CPU Cache Misses on UDP Packet Parsing - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/impact-of-cpu-cache-misses-on-udp-packet-parsing" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="High-throughput network applications rely heavily on rapid UDP packet processing, where the bottleneck is frequently memory access latency rather than computational capacity. When UDP packet parsing algorithms suffer from CPU cache misses, the CPU pipeli" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="impact-of-cpu-cache-misses-on-udp-packet-parsing">Impact of CPU
+Cache Misses on UDP Packet Parsing</h1>
+<p>High-throughput network applications rely heavily on rapid UDP packet
+processing, where the bottleneck is frequently memory access latency
+rather than computational capacity. When UDP packet parsing algorithms
+suffer from CPU cache misses, the CPU pipeline stalls while waiting for
+data to fetch from higher-level caches or main memory (DRAM). This
+article explores how cache misses degrade packet parsing performance,
+the specific mechanisms that cause these bottlenecks, and the
+architectural techniques used to mitigate their impact.</p>
+<h2 id="the-cost-of-memory-stalls-in-high-speed-networking">The Cost of
+Memory Stalls in High-Speed Networking</h2>
+<p>UDP parsing is computationally lightweight compared to
+connection-oriented protocols like TCP. Because the protocol has minimal
+header overhead (an 8-byte header) and no native state-tracking
+requirements, the CPU can parse headers in just a few cycles.</p>
+<p>However, modern network interfaces operating at 10 Gbps, 40 Gbps, or
+100 Gbps require processing tens of millions of packets per second. At
+100 Gbps, a packet can arrive every few nanoseconds. When a cache miss
+occurs, the CPU must stall:</p>
+<ul>
+<li><strong>L1 Data Cache Hit:</strong> ~4–5 CPU cycles (~1 ns)</li>
+<li><strong>L2 Cache Hit:</strong> ~12–14 CPU cycles (~3–4 ns)</li>
+<li><strong>L3 Cache Hit (LLC):</strong> ~40–60 CPU cycles (~10–15
+ns)</li>
+<li><strong>Main Memory (DRAM):</strong> ~150–250+ CPU cycles (~50–70
+ns)</li>
+</ul>
+<p>A single L3 miss to DRAM can stall the processing core for longer
+than the entire inter-arrival window of subsequent packets, quickly
+causing receive (RX) ring buffers to overflow and resulting in packet
+drops.</p>
+<h2 id="primary-sources-of-cache-misses-in-udp-parsers">Primary Sources
+of Cache Misses in UDP Parsers</h2>
+<p>Cache misses in UDP parsing logic generally fall into three
+categories:</p>
+<h3 id="1-header-and-payload-access-misses-data-cache">1. Header and
+Payload Access Misses (Data Cache)</h3>
+<p>When a network card (NIC) writes incoming packets via Direct Memory
+Access (DMA) into host RAM, the packet data often lands in the Last
+Level Cache (via technologies like Intel DDIO) or directly in DRAM. If
+the parsing algorithm reads deep into the packet (e.g., custom
+application-layer headers or encapsulation protocols like VXLAN/Geneve)
+without proper cache placement, it triggers sequential D-cache misses
+for every cache line (typically 64 bytes) traversed.</p>
+<h3 id="2-pointer-chasing-and-non-contiguous-buffers">2. Pointer Chasing
+and Non-Contiguous Buffers</h3>
+<p>Parsing architectures that use linked lists, nested structures, or
+scattered memory buffers force the CPU to follow memory pointers across
+non-contiguous addresses. Each dereference can result in a separate
+cold-cache access, destroying spatial locality.</p>
+<h3 id="3-branching-and-dispatch-logic-instruction-cache">3. Branching
+and Dispatch Logic (Instruction Cache)</h3>
+<p>UDP parsers that support multiple application-level protocols often
+use large <code>switch</code> statements or dynamic dispatch tables.
+Unpredictable packet sequences invalidate the CPU’s branch predictor and
+evict parsing instructions from the L1 Instruction Cache (I-cache),
+causing execution stalls.</p>
+<h2 id="core-impacts-on-system-performance">Core Impacts on System
+Performance</h2>
+<ul>
+<li><strong>Throughput Collapse:</strong> As packet rates increase,
+processing time shifts from instruction execution to memory-wait states,
+capping maximum sustainable throughput far below the line rate.</li>
+<li><strong>Increased Tail Latency and Jitter:</strong> Cache hits
+process in sub-microsecond times, while cache misses take significantly
+longer. This variance creates extreme spikes in 99th and 99.9th
+percentile processing latency.</li>
+<li><strong>Queue Invalidation:</strong> Stalls during parsing delay the
+release of packet descriptors back to the NIC ring buffer, causing
+hardware buffer starvation.</li>
+</ul>
+<h2 id="optimizing-udp-parsers-for-cache-locality">Optimizing UDP
+Parsers for Cache Locality</h2>
+<p>To minimize cache misses and sustain high-speed parsing, modern
+network stacks implement several software patterns:</p>
+<ul>
+<li><strong>Batch Processing:</strong> Parsing packets in batches (e.g.,
+32 or 64 packets at a time) keeps the parsing instructions hot in the L1
+I-cache and allows vectorization.</li>
+<li><strong>Explicit Software Prefetching:</strong> Issuing prefetch
+instructions (<code>_mm_prefetch</code>) for packet metadata and payload
+lines several packets ahead hides DRAM fetch latency behind active
+compute cycles.</li>
+<li><strong>Cache-Line Alignment:</strong> Aligning packet buffers,
+descriptors, and internal state structures to 64-byte boundaries ensures
+a critical header does not span across two separate cache lines.</li>
+<li><strong>Header-Payload Splitting:</strong> Storing packet metadata
+and headers in contiguous, small memory regions allows the parser to
+inspect headers without loading unused payload bytes into the L1/L2
+caches.</li>
+<li><strong>Kernel-Bypass and Zero-Copy Frameworks:</strong> Utilizing
+frameworks such as DPDK or eBPF/XDP avoids intermediary kernel copies
+and keeps memory allocations within NUMA-local cache hierarchies.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

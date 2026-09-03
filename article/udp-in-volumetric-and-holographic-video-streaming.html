@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDP in Volumetric and Holographic Video Streaming - udp</title>
+    <meta name="description" content="Holographic and volumetric video streaming represent the next frontier in immersive multimedia, enabling true three-dimensional experiences with six degrees of freedom (6DoF). However, the massive data rates and strict real-time rendering demands of 3D p">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/udp-in-volumetric-and-holographic-video-streaming">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="UDP in Volumetric and Holographic Video Streaming - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/udp-in-volumetric-and-holographic-video-streaming" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Holographic and volumetric video streaming represent the next frontier in immersive multimedia, enabling true three-dimensional experiences with six degrees of freedom (6DoF). However, the massive data rates and strict real-time rendering demands of 3D p" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="udp-in-volumetric-and-holographic-video-streaming">UDP in
+Volumetric and Holographic Video Streaming</h1>
+<p>Holographic and volumetric video streaming represent the next
+frontier in immersive multimedia, enabling true three-dimensional
+experiences with six degrees of freedom (6DoF). However, the massive
+data rates and strict real-time rendering demands of 3D point clouds and
+dynamic meshes make traditional transport protocols insufficient. This
+article explores how the User Datagram Protocol (UDP) serves as a
+critical foundation for real-time volumetric streaming, eliminating
+delivery bottlenecks, minimizing latency, and powering the next
+generation of spatial computing experiences.</p>
+<h2 id="the-data-demands-of-holographic-streaming">The Data Demands of
+Holographic Streaming</h2>
+<p>Volumetric video captures objects and environments from multiple
+angles, encoding geometry, texture, and depth into dynamic 3D
+representations such as point clouds, polygonal meshes, or neural
+radiance fields (NeRFs). Unlike standard 2D or 360-degree flat video,
+volumetric streams must continuously update spatial coordinates in real
+time based on user perspective.</p>
+<p>This creates two primary challenges:</p>
+<ul>
+<li><strong>Massive Bandwidth Requirements:</strong> Uncompressed or
+lightly compressed 3D visual data can require hundreds of megabits or
+even gigabits per second.</li>
+<li><strong>Ultra-Low Latency (Motion-to-Photon):</strong> In
+interactive augmented reality (AR) and virtual reality (VR), any delay
+exceeding 20 milliseconds between a user's head movement and visual
+feedback can induce motion sickness and break immersion.</li>
+</ul>
+<h2 id="why-tcp-falls-short-for-spatial-video">Why TCP Falls Short for
+Spatial Video</h2>
+<p>The Transmission Control Protocol (TCP) guarantees reliable and
+ordered packet delivery through acknowledgments and automatic
+retransmissions. In high-bandwidth, real-time spatial streaming, these
+features become disadvantages:</p>
+<ul>
+<li><strong>Head-of-Line Blocking:</strong> If a single packet is
+dropped, TCP halts the delivery of subsequent packets until the missing
+packet is retransmitted and received.</li>
+<li><strong>Increased Jitter and Latency:</strong> Retransmission delays
+introduce severe latency spikes, making real-time interactive rendering
+impossible.</li>
+<li><strong>Outdated Data Delivery:</strong> For a moving user, a
+delayed 3D frame packet represents a perspective that the viewer has
+already abandoned, rendering the retransmitted data useless upon
+arrival.</li>
+</ul>
+<h2 id="the-key-roles-of-udp-in-volumetric-streaming">The Key Roles of
+UDP in Volumetric Streaming</h2>
+<p>UDP operates as a connectionless, "fire-and-forget" protocol. It
+discards packet acknowledgment, ordering guarantees, and retransmission
+mechanisms to maximize speed and throughput. In volumetric and
+holographic pipelines, UDP provides several core advantages:</p>
+<h3 id="1-eliminating-latency-bottlenecks">1. Eliminating Latency
+Bottlenecks</h3>
+<p>By eliminating the overhead of connection handshakes and
+retransmission loops, UDP streams packets immediately as they are
+generated by media servers or edge rendering nodes. This direct delivery
+pipeline is essential to keeping motion-to-photon latency within
+acceptable thresholds.</p>
+<h3 id="2-prioritizing-timeliness-over-completeness">2. Prioritizing
+Timeliness Over Completeness</h3>
+<p>In volumetric video, frame timeliness is far more important than 100%
+data integrity. If a packet containing partial point cloud data is lost,
+modern rendering engines can interpolate missing points or conceal
+artifacts using temporal and spatial prediction algorithms. A slightly
+degraded frame rendered on time is vastly superior to a perfect frame
+rendered too late.</p>
+<h3 id="3-enabling-viewport-dependent-streaming">3. Enabling
+Viewport-Dependent Streaming</h3>
+<p>Advanced volumetric systems only stream the specific 3D data visible
+within the user's current field of view. As the user moves, viewport
+prediction updates instantly. UDP allows lightweight, continuous
+transmission of these positional telemetry packets and immediate
+redirection of high-density stream layers without transport-level
+negotiation delays.</p>
+<h3 id="4-serving-as-the-foundation-for-modern-protocols">4. Serving as
+the Foundation for Modern Protocols</h3>
+<p>While raw UDP lacks congestion control and security, it serves as the
+underlying transport layer for advanced application-level protocols
+tailored for spatial data:</p>
+<ul>
+<li><strong>RTP/SRTP (Real-time Transport Protocol):</strong> Runs on
+UDP to provide payload identification, sequence numbering, and
+timestamping for synchronized audio-visual 3D assets.</li>
+<li><strong>WebRTC:</strong> Uses UDP to establish low-latency,
+peer-to-peer data channels ideal for interactive multi-user holographic
+telepresence.</li>
+<li><strong>QUIC (HTTP/3):</strong> Built on top of UDP, QUIC solves
+head-of-line blocking while offering multiplexing and rapid connection
+migration, allowing high-throughput volumetric assets to stream
+efficiently across variable networks.</li>
+</ul>
+<h2 id="conclusion">Conclusion</h2>
+<p>As spatial computing, AR headsets, and holographic displays become
+mainstream, transport layers must accommodate unprecedented data density
+without sacrificing real-time interactivity. UDP's speed-focused,
+connectionless architecture makes it the indispensable foundation for
+volumetric streaming, ensuring that immersive visual data arrives
+instantaneously to preserve immersion and visual fidelity.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

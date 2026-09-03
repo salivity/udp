@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purpose of Rate Limiting UDP Traffic on Firewalls - udp</title>
+    <meta name="description" content="Rate limiting UDP traffic on a firewall is a critical network security practice designed to control the flow of User Datagram Protocol (UDP) packets entering or leaving a network. Because UDP is a connectionless protocol vulnerable to spoofing and abuse,">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/purpose-of-rate-limiting-udp-traffic-on-firewalls">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Purpose of Rate Limiting UDP Traffic on Firewalls - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/purpose-of-rate-limiting-udp-traffic-on-firewalls" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Rate limiting UDP traffic on a firewall is a critical network security practice designed to control the flow of User Datagram Protocol (UDP) packets entering or leaving a network. Because UDP is a connectionless protocol vulnerable to spoofing and abuse," />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="purpose-of-rate-limiting-udp-traffic-on-firewalls">Purpose of
+Rate Limiting UDP Traffic on Firewalls</h1>
+<p>Rate limiting UDP traffic on a firewall is a critical network
+security practice designed to control the flow of User Datagram Protocol
+(UDP) packets entering or leaving a network. Because UDP is a
+connectionless protocol vulnerable to spoofing and abuse, rate limiting
+serves primarily to defend against Distributed Denial of Service (DDoS)
+attacks, prevent bandwidth saturation, protect firewall resources, and
+maintain consistent quality of service for legitimate network
+operations.</p>
+<h2 id="mitigating-udp-flood-and-amplification-attacks">Mitigating UDP
+Flood and Amplification Attacks</h2>
+<p>UDP is connectionless and does not require a three-way handshake like
+TCP. Attackers exploit this design to flood networks with massive
+volumes of UDP packets containing forged source IP addresses.</p>
+<p>Common attack vectors include:</p>
+<ul>
+<li><strong>UDP Flood Attacks:</strong> Attackers blast random ports on
+a target host, forcing the operating system to check for listening
+applications and return ICMP "Destination Unreachable" packets,
+exhausting system resources.</li>
+<li><strong>Amplification/Reflection Attacks:</strong> Protocols
+utilizing UDP (such as DNS, NTP, and SNMP) can be used to reflect large
+responses toward a victim from small requests.</li>
+</ul>
+<p>Rate limiting caps the number of UDP packets processed per second,
+neutralizing sudden spikes caused by these attacks before they disrupt
+network availability.</p>
+<h2 id="conserving-bandwidth-and-firewall-processing-power">Conserving
+Bandwidth and Firewall Processing Power</h2>
+<p>Unlike TCP, UDP lacks built-in flow control and congestion avoidance
+mechanisms. If left unchecked, runaway UDP traffic can consume an entire
+network link, starving mission-critical TCP connections (such as
+HTTP/HTTPS, SSH, and database traffic).</p>
+<p>Furthermore, stateful firewalls track connections using state tables.
+While UDP does not establish true connections, firewalls still create
+pseudo-state entries to track return traffic. Massive UDP traffic bursts
+can quickly exhaust the firewall's state table memory and CPU cycles.
+Setting strict thresholds prevents hardware exhaustion and ensures the
+firewall remains responsive.</p>
+<h2 id="thwarting-reconnaissance-and-port-scanning">Thwarting
+Reconnaissance and Port Scanning</h2>
+<p>Malicious actors routinely scan broad ranges of UDP ports to identify
+active services and vulnerabilities. Because UDP requires a packet per
+port to test, an aggressive scan generates high-frequency packet bursts.
+Applying rate limits to incoming UDP packets slows automated
+reconnaissance tools, significantly reducing an attacker’s ability to
+map internal network services efficiently.</p>
+<h2 id="maintaining-quality-of-service-qos">Maintaining Quality of
+Service (QoS)</h2>
+<p>Legitimate real-time applications—such as VoIP (SIP/RTP), video
+conferencing, and online gaming—rely on UDP for low-latency
+communication. Rate limiting allows network administrators to allocate
+specific bandwidth caps to general UDP traffic while reserving dedicated
+throughput for critical real-time services. This prevents non-essential
+or abusive UDP packets from degrading the audio and video quality of
+legitimate business communications.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

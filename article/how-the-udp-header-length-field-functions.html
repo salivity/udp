@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How the UDP Header Length Field Functions - udp</title>
+    <meta name="description" content="This article provides a concise overview of the Length field in the User Datagram Protocol (UDP) header, detailing its technical structure, purpose, and operational mechanics. It covers how this 16-bit field calculates the total byte count of a UDP datag">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-the-udp-header-length-field-functions">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How the UDP Header Length Field Functions - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-the-udp-header-length-field-functions" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article provides a concise overview of the Length field in the User Datagram Protocol (UDP) header, detailing its technical structure, purpose, and operational mechanics. It covers how this 16-bit field calculates the total byte count of a UDP datag" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-the-udp-header-length-field-functions">How the UDP Header
+Length Field Functions</h1>
+<p>This article provides a concise overview of the Length field in the
+User Datagram Protocol (UDP) header, detailing its technical structure,
+purpose, and operational mechanics. It covers how this 16-bit field
+calculates the total byte count of a UDP datagram, its minimum and
+maximum constraints, and how receiving network stacks utilize it for
+boundary delineation and error validation.</p>
+<h3 id="structure-and-placement">Structure and Placement</h3>
+<p>The Length field is a 16-bit field occupying bytes 4 and 5 (bits 32
+through 47) of the 8-byte UDP header. It indicates the total length of
+the entire UDP datagram in bytes (octets), measuring both the 8-byte UDP
+header itself and the encapsulated data payload.</p>
+<pre><code> 0      7 8     15 16    23 24    31
++--------+--------+--------+--------+
+|     Source      |   Destination   |
+|      Port       |      Port       |
++--------+--------+--------+--------+
+|                 |                 |
+|     Length      |    Checksum     |
++--------+--------+--------+--------+
+|                                   |
+|              Payload              |
+|              ...                  |
++-----------------------------------+</code></pre>
+<h3 id="minimum-and-maximum-values">Minimum and Maximum Values</h3>
+<ul>
+<li><strong>Minimum Length:</strong> The minimum value for the Length
+field is <strong>8 bytes</strong> (<code>0x0008</code> in hexadecimal).
+This represents a datagram that contains only the 8-byte UDP header with
+zero bytes of data payload.</li>
+<li><strong>Theoretical Maximum:</strong> Because the field is 16 bits
+wide, its theoretical maximum value is <strong>65,535 bytes</strong>
+(<span class="math inline">\(2^{16} - 1\)</span>).</li>
+<li><strong>Practical Maximum:</strong> The actual practical limit is
+constrained by the underlying Internet Protocol (IP) layer. In IPv4, the
+maximum total packet size is 65,535 bytes. After subtracting the
+standard 20-byte IPv4 header and the 8-byte UDP header, the maximum UDP
+payload size is <strong>65,507 bytes</strong>.</li>
+</ul>
+<h3 id="core-functions-of-the-length-field">Core Functions of the Length
+Field</h3>
+<ol type="1">
+<li><p><strong>Datagram Boundary Delineation</strong><br />
+UDP is a message-oriented (datagram-based) protocol, unlike TCP, which
+is stream-oriented. The Length field allows the receiving transport
+layer to determine exact packet boundaries and extract the complete,
+discrete message passed by the application layer.</p></li>
+<li><p><strong>Checksum Verification</strong><br />
+The Length value is a required component in calculating the optional (in
+IPv4) or mandatory (in IPv6) UDP checksum. During this process, the UDP
+Length is inserted into a virtual "pseudo-header" alongside the source
+IP, destination IP, and protocol number to ensure data integrity across
+transit.</p></li>
+<li><p><strong>Packet Validation and Consistency Checking</strong><br />
+When an endpoint receives a packet, the operating system's network stack
+compares the UDP Length field against the total length reported in the
+IP header (minus the IP header length). If the UDP Length specifies
+fewer or more bytes than what was delivered by the IP layer, the
+datagram is considered malformed or truncated and is dropped.</p></li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

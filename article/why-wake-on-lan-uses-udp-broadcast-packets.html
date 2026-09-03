@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Wake-on-LAN Uses UDP Broadcast Packets - udp</title>
+    <meta name="description" content="Wake-on-LAN (WoL) relies on User Datagram Protocol (UDP) broadcast packets because powered-off or sleeping computers lack the active operating system and network stack required for complex, connection-oriented protocols. By using a lightweight, connectio">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/why-wake-on-lan-uses-udp-broadcast-packets">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why Wake-on-LAN Uses UDP Broadcast Packets - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/why-wake-on-lan-uses-udp-broadcast-packets" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Wake-on-LAN (WoL) relies on User Datagram Protocol (UDP) broadcast packets because powered-off or sleeping computers lack the active operating system and network stack required for complex, connection-oriented protocols. By using a lightweight, connectio" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="why-wake-on-lan-uses-udp-broadcast-packets">Why Wake-on-LAN Uses
+UDP Broadcast Packets</h1>
+<p>Wake-on-LAN (WoL) relies on User Datagram Protocol (UDP) broadcast
+packets because powered-off or sleeping computers lack the active
+operating system and network stack required for complex,
+connection-oriented protocols. By using a lightweight, connectionless
+UDP broadcast, the WoL "Magic Packet" can be delivered across a local
+network segment directly to a low-power Network Interface Card (NIC)
+without needing an active IP address, an established handshake, or
+persistent switch address tables.</p>
+<h3 id="the-absence-of-an-active-operating-system">The Absence of an
+Active Operating System</h3>
+<p>When a computer is in a low-power state (such as ACPI states S3, S4,
+or S5), the operating system is not running, and the standard TCP/IP
+network stack is completely shut down. The main processor and system
+memory are inactive, leaving only auxiliary power supplied to the NIC.
+In this state, the NIC firmware is only capable of simple pattern
+matching at the hardware level and cannot participate in complex network
+conversations.</p>
+<h3 id="why-udp-is-chosen-over-tcp">Why UDP Is Chosen Over TCP</h3>
+<p>TCP (Transmission Control Protocol) is connection-oriented and
+requires a three-way handshake (<code>SYN</code>, <code>SYN-ACK</code>,
+<code>ACK</code>) to establish communication. A sleeping machine cannot
+generate a response to initiate or acknowledge a TCP session.</p>
+<p>UDP, by contrast, is a connectionless protocol:</p>
+<ul>
+<li><strong>No Handshake:</strong> Packets are sent without establishing
+a prior connection or verifying the recipient's readiness.</li>
+<li><strong>Low Overhead:</strong> UDP headers are minimal and simple,
+allowing the basic firmware on a low-power NIC to parse the payload
+without needing full protocol decoding.</li>
+<li><strong>Fire-and-Forget Delivery:</strong> The sender simply
+transmits the data, making it ideal for triggering an action where
+receipt confirmation is unnecessary until the machine is fully powered
+on.</li>
+</ul>
+<p>While the Magic Packet can technically be encapsulated in any
+protocol or sent directly as a raw Layer 2 Ethernet frame (EtherType
+<code>0x0842</code>), UDP is the most widely adopted transport layer
+choice because standard network APIs allow applications to send UDP
+packets easily without requiring administrative or raw socket
+permissions. Typically, UDP ports 7 or 9 are used.</p>
+<h3 id="why-broadcast-delivery-is-essential">Why Broadcast Delivery Is
+Essential</h3>
+<p>Unicast network traffic is addressed to a specific IP and MAC
+address, relying on network switches and routers to forward the packet
+directly to the destination port. However, unicast delivery fails when a
+computer is asleep for two primary reasons:</p>
+<ol type="1">
+<li><strong>Lack of an Active IP Address:</strong> A powered-down
+machine usually releases its IP configuration. Even if it retains an
+assigned IP via a static mapping or DHCP lease, the machine cannot reply
+to Address Resolution Protocol (ARP) requests.</li>
+<li><strong>ARP Cache and Switch Table Expiration:</strong> Network
+switches maintain dynamic tables mapping MAC addresses to specific
+physical switch ports. Over time, these entries expire. If a device has
+been asleep for several minutes, the switch no longer knows which port
+connects to the target machine and will drop unicast traffic intended
+for it.</li>
+</ol>
+<p>Broadcast addresses (such as <code>255.255.255.255</code> for local
+broadcasts or a subnet-directed broadcast address) solve this by forcing
+the switch to flood the packet out of every active port on the local
+subnet. This guarantees that the target computer's NIC receives the
+frame, regardless of how long the machine has been asleep.</p>
+<h3 id="processing-the-magic-packet">Processing the Magic Packet</h3>
+<p>Once the broadcast packet arrives at all listening interfaces on the
+network:</p>
+<ol type="1">
+<li>The auxiliary-powered NIC captures the incoming frame.</li>
+<li>The hardware scans the packet payload for the Magic Packet
+signature: a synchronization stream of 6 bytes of all ones
+(<code>FF FF FF FF FF FF</code>) followed immediately by 16 continuous
+repetitions of the target NIC's specific 48-bit MAC address.</li>
+<li>If the sequence matches the card's burned-in hardware address, the
+NIC signals the computer's power supply or motherboard (via PCIe or a
+WAKE line) to initiate the system boot sequence. All other machines on
+the subnet simply discard the packet.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

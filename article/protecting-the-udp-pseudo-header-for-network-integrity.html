@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protecting the UDP Pseudo Header for Network Integrity - udp</title>
+    <meta name="description" content="The UDP pseudo-header plays a crucial role in validating data transmission by binding the network layer's routing information to the transport layer's payload. Although not transmitted as an independent packet header, the pseudo-header is used to calcula">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/protecting-the-udp-pseudo-header-for-network-integrity">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Protecting the UDP Pseudo Header for Network Integrity - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/protecting-the-udp-pseudo-header-for-network-integrity" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The UDP pseudo-header plays a crucial role in validating data transmission by binding the network layer's routing information to the transport layer's payload. Although not transmitted as an independent packet header, the pseudo-header is used to calcula" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1
+id="protecting-the-udp-pseudo-header-for-network-integrity">Protecting
+the UDP Pseudo Header for Network Integrity</h1>
+<p>The UDP pseudo-header plays a crucial role in validating data
+transmission by binding the network layer's routing information to the
+transport layer's payload. Although not transmitted as an independent
+packet header, the pseudo-header is used to calculate the UDP checksum,
+ensuring that datagrams arrive at the correct destination without silent
+corruption. Protecting this validation process is essential for
+maintaining network integrity, mitigating address-spoofing risks, and
+preventing misrouted traffic across interconnected systems.</p>
+<h3 id="understanding-the-udp-pseudo-header">Understanding the UDP
+Pseudo-Header</h3>
+<p>In the User Datagram Protocol (UDP), the pseudo-header is a
+conceptual data structure constructed during checksum computation. It
+includes critical fields from the IPv4 or IPv6 header:</p>
+<ul>
+<li><strong>Source IP Address:</strong> Identifies the origin host.</li>
+<li><strong>Destination IP Address:</strong> Identifies the intended
+recipient host.</li>
+<li><strong>Protocol/Next Header:</strong> Specifies the transport
+protocol (value 17 for UDP).</li>
+<li><strong>UDP Length:</strong> Denotes the total size of the UDP
+header and data.</li>
+</ul>
+<p>During transmission, the sender calculates a checksum over both the
+pseudo-header and the actual UDP segment. The receiving host recreates
+the pseudo-header using the incoming IP packet fields and verifies the
+checksum.</p>
+<h3 id="preventing-packet-misdelivery">Preventing Packet
+Misdelivery</h3>
+<p>The primary function of incorporating the pseudo-header into the UDP
+checksum is to ensure that the datagram reached the correct IP address
+and port combination. Because IP headers maintain their own checksum (in
+IPv4) or rely entirely on higher layers (in IPv6), a bit-flip or routing
+error in the destination IP address could cause an otherwise valid UDP
+payload to be delivered to the wrong application.</p>
+<p>By tying the IP routing attributes directly to the transport
+checksum:</p>
+<ol type="1">
+<li><strong>Address Verification:</strong> Any modification to the
+source or destination IP addresses invalidates the transport
+checksum.</li>
+<li><strong>Silent Drop:</strong> Receiving hosts automatically discard
+misrouted packets instead of forwarding erroneous data to higher-level
+applications.</li>
+</ol>
+<h3 id="mitigating-security-vulnerabilities-and-spoofing">Mitigating
+Security Vulnerabilities and Spoofing</h3>
+<p>Because UDP is connectionless and stateless, it is inherently
+vulnerable to source address spoofing and traffic injection attacks. If
+integrity verification at the pseudo-header level fails or is
+disabled:</p>
+<ul>
+<li><strong>Man-in-the-Middle Manipulation:</strong> Attackers can alter
+routing parameters without detection if the receiving stack fails to
+enforce checksum validations against the pseudo-header.</li>
+<li><strong>Cross-Protocol Attacks:</strong> Incorporating the protocol
+field ensures that non-UDP packets masquerading as UDP traffic are
+detected and rejected.</li>
+<li><strong>Session Hijacking in UDP-Based Protocols:</strong>
+Application protocols relying on UDP (such as DNS, DHCP, and QUIC)
+depend on valid network-layer identifiers. Ensuring checksum accuracy
+protects these upper-layer protocols from processing forged requests or
+responses.</li>
+</ul>
+<h3 id="importance-in-modern-ipv6-deployments">Importance in Modern IPv6
+Deployments</h3>
+<p>In IPv6, the network layer header no longer contains a header
+checksum, shifting the entire burden of error detection to layer 4
+protocols. Consequently, UDP checksum calculation using the IPv6
+pseudo-header is mandatory. Protecting and strictly enforcing
+pseudo-header verification in IPv6 environments is necessary to catch
+transmission errors that would otherwise pass undetected through the
+network stack.</p>
+<p>Protecting the integrity of the UDP pseudo-header ensures that
+network boundaries are respected, data arrives at its intended
+destination, and corrupted or tampered datagrams are intercepted before
+affecting upper-layer applications.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

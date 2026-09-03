@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implementing Packet Ordering for UDP Data - udp</title>
+    <meta name="description" content="User Datagram Protocol (UDP) does not inherently guarantee the order of delivered packets, leaving the responsibility of sequence management entirely to the application layer. To implement packet ordering logic for UDP, developers must attach explicit se">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/implementing-packet-ordering-for-udp-data">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Implementing Packet Ordering for UDP Data - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/implementing-packet-ordering-for-udp-data" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="User Datagram Protocol (UDP) does not inherently guarantee the order of delivered packets, leaving the responsibility of sequence management entirely to the application layer. To implement packet ordering logic for UDP, developers must attach explicit se" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="implementing-packet-ordering-for-udp-data">Implementing Packet
+Ordering for UDP Data</h1>
+<p>User Datagram Protocol (UDP) does not inherently guarantee the order
+of delivered packets, leaving the responsibility of sequence management
+entirely to the application layer. To implement packet ordering logic
+for UDP, developers must attach explicit sequence identifiers to
+outgoing packets, manage a reordering buffer on the receiving end, track
+the next expected packet, and define strategies to handle sequence
+number wraparound and packet loss.</p>
+<h3 id="1-add-custom-sequence-headers">1. Add Custom Sequence
+Headers</h3>
+<p>Because standard UDP headers lack sequence data, you must encapsulate
+your payload within a custom application header.</p>
+<ul>
+<li><strong>Sequence Number:</strong> Attach a monotonically increasing
+integer (typically a 16-bit or 32-bit unsigned integer) to every
+transmitted packet.</li>
+<li><strong>Timestamp (Optional):</strong> Include a timestamp to help
+measure latency and make informed decisions on whether to wait for late
+packets.</li>
+</ul>
+<h3 id="2-implement-a-receiver-reordering-buffer">2. Implement a
+Receiver Reordering Buffer</h3>
+<p>On the receiving client or server, incoming packets must not be
+processed immediately unless they arrive in exact sequential order.
+Store out-of-order packets in an in-memory buffer, such as a min-heap
+(priority queue), a ring buffer, or a sorted map keyed by the sequence
+number.</p>
+<h3 id="3-apply-the-ordering-algorithm">3. Apply the Ordering
+Algorithm</h3>
+<p>Maintain an internal state variable,
+<code>expected_sequence_number</code>, initialized to the first sequence
+ID. For every incoming packet:</p>
+<ol type="1">
+<li><strong>In-Order Arrival
+(<code>packet_id == expected_sequence_number</code>):</strong>
+<ul>
+<li>Process the packet immediately.</li>
+<li>Increment <code>expected_sequence_number</code>.</li>
+<li>Check the buffer to see if subsequent packets (e.g.,
+<code>expected_sequence_number + 1</code>) are already stored. Drain and
+process all continuous sequential packets from the buffer, updating
+<code>expected_sequence_number</code> accordingly.</li>
+</ul></li>
+<li><strong>Future Arrival
+(<code>packet_id &gt; expected_sequence_number</code>):</strong>
+<ul>
+<li>The packet has arrived ahead of previous data. Insert the packet
+into the reordering buffer.</li>
+</ul></li>
+<li><strong>Past Arrival
+(<code>packet_id &lt; expected_sequence_number</code>):</strong>
+<ul>
+<li>The packet is a duplicate or arrived too late to be useful. Discard
+it immediately.</li>
+</ul></li>
+</ol>
+<h3 id="4-handle-sequence-number-wraparound">4. Handle Sequence Number
+Wraparound</h3>
+<p>Fixed-size integers eventually overflow and wrap around to zero. To
+correctly determine whether a packet is from the past or future across a
+boundary, use serial number arithmetic (modular comparison):</p>
+<pre class="text"><code>// Example for an unsigned 16-bit integer (0 to 65535)
+bool is_newer(uint16_t seq_a, uint16_t seq_b) {
+    return (int16_t)(seq_a - seq_b) &gt; 0;
+}</code></pre>
+<p>This logic evaluates differences relative to half the maximum integer
+range, correctly identifying wrapped values.</p>
+<h3 id="5-manage-missing-packets-and-timeouts">5. Manage Missing Packets
+and Timeouts</h3>
+<p>UDP does not guarantee delivery, meaning an expected packet might
+never arrive. Leaving the buffer stalled indefinitely causes unbounded
+latency and memory growth. Implement one of the following resolution
+strategies based on application requirements:</p>
+<ul>
+<li><strong>Drop and Advance (Real-Time Media/Gaming):</strong> Set a
+maximum wait time (hold timer) or a buffer size threshold. If the
+missing packet does not arrive before the threshold expires, increment
+<code>expected_sequence_number</code> past the gap, discard or mark the
+missing packet as lost, and proceed with processing the buffered
+data.</li>
+<li><strong>Negative Acknowledgement / Retransmission (Reliable
+UDP):</strong> If an out-of-order packet arrives, immediately send a
+NACK (Negative Acknowledgment) back to the sender to request a fast
+retransmission of the missing sequence numbers before the timeout
+expires.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Is the UDP Checksum Optional in IPv4? - udp</title>
+    <meta name="description" content="Under the IPv4 protocol, the User Datagram Protocol (UDP) checksum field is entirely optional. This article explains how the UDP checksum operates in IPv4, how unused checksums are represented, the differences between IPv4 and IPv6 implementations, and t">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/is-the-udp-checksum-optional-in-ipv4">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Is the UDP Checksum Optional in IPv4? - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/is-the-udp-checksum-optional-in-ipv4" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Under the IPv4 protocol, the User Datagram Protocol (UDP) checksum field is entirely optional. This article explains how the UDP checksum operates in IPv4, how unused checksums are represented, the differences between IPv4 and IPv6 implementations, and t" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="is-the-udp-checksum-optional-in-ipv4">Is the UDP Checksum
+Optional in IPv4?</h1>
+<p>Under the IPv4 protocol, the User Datagram Protocol (UDP) checksum
+field is entirely optional. This article explains how the UDP checksum
+operates in IPv4, how unused checksums are represented, the differences
+between IPv4 and IPv6 implementations, and the practical implications of
+omitting checksum verification.</p>
+<h2 id="the-udp-checksum-in-ipv4">The UDP Checksum in IPv4</h2>
+<p>According to RFC 768, which defines the User Datagram Protocol, the
+checksum field in IPv4 is optional. The UDP checksum is a 16-bit field
+designed to verify the data integrity of the UDP header, the payload,
+and a conceptual IPv4 "pseudo-header" containing the source and
+destination IP addresses.</p>
+<p>When a transmitting device decides not to calculate the checksum, it
+places an all-zero value (<code>0x0000</code>) into the checksum field.
+When the receiving device reads a checksum value of zero, it skips the
+validation step and passes the payload directly to the application
+layer.</p>
+<p>If the checksum algorithm calculates an actual checksum value of zero
+(<code>0x0000</code>), it is transmitted as all ones
+(<code>0xFFFF</code>, or <code>-0</code> in one's complement arithmetic)
+to distinguish a calculated zero from a disabled checksum.</p>
+<h2 id="ipv4-vs-ipv6-checksum-requirements">IPv4 vs. IPv6 Checksum
+Requirements</h2>
+<p>The optional nature of the UDP checksum is exclusive to IPv4:</p>
+<ul>
+<li><strong>IPv4:</strong> The UDP checksum is optional. IPv4 includes
+its own header checksum to ensure that routing information remains
+intact, even if the payload data is not verified by UDP.</li>
+<li><strong>IPv6:</strong> The UDP checksum is mandatory. The IPv6
+protocol removed the base IP header checksum to improve routing
+efficiency, making the transport-layer UDP checksum necessary to prevent
+packets with corrupted destination addresses or payloads from reaching
+incorrect applications.</li>
+</ul>
+<h2 id="why-the-udp-checksum-was-made-optional-in-ipv4">Why the UDP
+Checksum Was Made Optional in IPv4</h2>
+<p>The designers of UDP made the checksum optional primarily for
+performance and flexibility:</p>
+<ul>
+<li><strong>Performance Optimization:</strong> In the early days of
+networking, computing a checksum over large payloads consumed
+significant CPU cycles. Omitting the calculation reduced latency and
+processing overhead on resource-constrained hardware.</li>
+<li><strong>Tolerant Applications:</strong> Real-time applications, such
+as voice over IP (VoIP) or video streaming, often prioritize low latency
+over absolute data accuracy. For these use cases, occasional bit errors
+are preferable to the processing delays associated with checksum
+verification.</li>
+</ul>
+<h2 id="risks-of-disabling-the-udp-checksum">Risks of Disabling the UDP
+Checksum</h2>
+<p>While disabling the checksum reduces processing overhead, it
+introduces notable risks:</p>
+<ul>
+<li><strong>Undetected Data Corruption:</strong> Without a checksum,
+transmission bit flips caused by faulty hardware or network noise go
+unnoticed, delivering corrupted data directly to the receiving
+application.</li>
+<li><strong>Misdirected Packets:</strong> Because the UDP checksum
+includes an IP pseudo-header, disabling it removes a layer of
+verification that ensures the packet was delivered to the intended
+destination IP address and port.</li>
+</ul>
+<p>Modern network interfaces typically support hardware checksum
+offloading, eliminating the CPU performance penalty. Consequently,
+disabling the UDP checksum in IPv4 is rarely necessary or recommended in
+modern network environments.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

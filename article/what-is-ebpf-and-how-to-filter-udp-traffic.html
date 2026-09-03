@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is eBPF and How to Filter UDP Traffic - udp</title>
+    <meta name="description" content="Extended Berkeley Packet Filter (eBPF) is a powerful Linux kernel technology that allows developers to run sandboxed, custom bytecode directly inside the kernel without changing kernel source code or loading kernel modules. When applied to networking, eB">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/what-is-ebpf-and-how-to-filter-udp-traffic">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is eBPF and How to Filter UDP Traffic - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/what-is-ebpf-and-how-to-filter-udp-traffic" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extended Berkeley Packet Filter (eBPF) is a powerful Linux kernel technology that allows developers to run sandboxed, custom bytecode directly inside the kernel without changing kernel source code or loading kernel modules. When applied to networking, eB" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-ebpf-and-how-to-filter-udp-traffic">What Is eBPF and How
+to Filter UDP Traffic</h1>
+<p>Extended Berkeley Packet Filter (eBPF) is a powerful Linux kernel
+technology that allows developers to run sandboxed, custom bytecode
+directly inside the kernel without changing kernel source code or
+loading kernel modules. When applied to networking, eBPF revolutionizes
+packet inspection and management by executing logic at the lowest levels
+of the operating system. This article explains the fundamentals of eBPF,
+why traditional UDP filtering methods struggle under heavy loads, and
+how eBPF—particularly when paired with the eXpress Data Path
+(XDP)—filters UDP traffic with exceptional speed and minimal resource
+consumption.</p>
+<h2 id="what-is-ebpf">What is eBPF?</h2>
+<p>eBPF is an execution engine embedded within the Linux kernel.
+Originally designed to filter network packets (as standard Berkeley
+Packet Filter or BPF), the "extended" version has evolved into a
+general-purpose engine used for system observability, security
+monitoring, and high-performance networking.</p>
+<p>Developers write eBPF programs in restricted C or Rust, compile them
+into bytecode, and load them into the kernel. Before execution, an
+in-kernel verifier ensures the program will not crash the system, enter
+infinite loops, or access unauthorized memory. Once verified, the
+program is Just-In-Time (JIT) compiled into native machine instructions
+for near-native execution speed.</p>
+<h2 id="the-challenge-with-traditional-udp-filtering">The Challenge with
+Traditional UDP Filtering</h2>
+<p>User Datagram Protocol (UDP) is a connectionless, stateless protocol
+commonly used for DNS, VoIP, gaming, and streaming. Because it lacks a
+handshake mechanism, UDP is frequently exploited in Distributed Denial
+of Service (DDoS) amplification and flood attacks.</p>
+<p>Standard filtering tools like <code>iptables</code> or traditional
+user-space firewalls present performance bottlenecks when handling high
+packet-per-second (PPS) UDP floods:</p>
+<ul>
+<li><strong>Kernel Overhead:</strong> For every incoming packet, the
+kernel must allocate memory structures (such as <code>sk_buff</code>),
+traverse the full network stack, and perform context switches.</li>
+<li><strong>CPU Saturation:</strong> Under heavy UDP floods, the CPU
+spends most of its cycles allocating and deallocating memory for packets
+that will ultimately be dropped, causing legitimate traffic to be
+delayed or lost.</li>
+</ul>
+<h2 id="how-ebpf-filters-udp-traffic-efficiently">How eBPF Filters UDP
+Traffic Efficiently</h2>
+<p>eBPF achieves high-efficiency UDP filtering primarily by running via
+the eXpress Data Path (XDP) framework. XDP allows eBPF programs to
+execute directly at the network interface card (NIC) driver level,
+before the kernel allocates an <code>sk_buff</code> or processes the
+network stack.</p>
+<h3 id="1-in-driver-packet-processing">1. In-Driver Packet
+Processing</h3>
+<p>When a packet arrives at the NIC, the driver passes the raw packet
+memory buffer directly to the attached eBPF/XDP program. The program
+inspects the raw Ethernet, IP, and UDP headers. If a packet is deemed
+malicious or unwanted, the program returns an <code>XDP_DROP</code>
+action. The packet is discarded immediately at the lowest possible
+layer, consuming virtually zero CPU or memory resources.</p>
+<h3 id="2-header-parsing-and-validation">2. Header Parsing and
+Validation</h3>
+<p>An eBPF program parses packet data sequentially:</p>
+<ol type="1">
+<li><strong>Ethernet Layer:</strong> Validates the protocol is IPv4 or
+IPv6.</li>
+<li><strong>IP Layer:</strong> Checks the transport protocol number for
+UDP (<code>0x11</code>).</li>
+<li><strong>UDP Layer:</strong> Reads the source port, destination port,
+length, and payload.</li>
+</ol>
+<p>If any criteria match a blocking rule (e.g., traffic targeting a
+closed port or matching a known attack signature), the filter drops the
+packet instantly.</p>
+<h3 id="3-dynamic-state-with-ebpf-maps">3. Dynamic State with eBPF
+Maps</h3>
+<p>eBPF programs use "Maps"—efficient key-value data structures shared
+between the kernel and user space. This enables dynamic filtering
+without reloading the eBPF program:</p>
+<ul>
+<li><strong>IP and Port Blacklists/Whitelists:</strong> User-space
+daemons can update a hash map of blocked IP addresses or ports in real
+time. The eBPF program queries this map during packet inspection.</li>
+<li><strong>Rate Limiting:</strong> eBPF maps can track packet counts
+and timestamps per source IP to enforce token-bucket or sliding-window
+rate limits directly in the kernel.</li>
+<li><strong>Metrics and Telemetry:</strong> Dropped and passed packet
+counters are stored in maps, allowing user-space monitoring tools to
+report on network health without adding latency to the data path.</li>
+</ul>
+<h2 id="key-actions-in-ebpf-udp-filtering">Key Actions in eBPF UDP
+Filtering</h2>
+<p>When processing a UDP packet, an eBPF/XDP program returns one of
+several execution verdicts:</p>
+<ul>
+<li><strong><code>XDP_DROP</code>:</strong> Discards the packet
+immediately at the driver level. This is the primary mechanism for
+mitigating high-volume UDP floods.</li>
+<li><strong><code>XDP_PASS</code>:</strong> Forwards the packet up to
+the standard Linux network stack for regular application
+processing.</li>
+<li><strong><code>XDP_TX</code>:</strong> Bounces the packet back out
+the same network interface, useful for lightweight UDP load balancers or
+reflection defenses.</li>
+<li><strong><code>XDP_REDIRECT</code>:</strong> Bypasses the local stack
+and forwards the packet to another network interface or a
+high-performance AF_XDP user-space socket.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>eBPF provides an ultra-efficient approach to UDP filtering by moving
+decision logic to the earliest point in the packet ingestion pipeline.
+By eliminating the overhead of kernel memory allocation and standard
+network stack traversal, eBPF programs can process tens of millions of
+UDP packets per second per core, making it the industry standard for
+modern DDoS mitigation, high-throughput firewalls, and edge routing.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

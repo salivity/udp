@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Write a Simple UDP Echo Server - udp</title>
+    <meta name="description" content="A User Datagram Protocol (UDP) echo server is a network application that listens for incoming datagrams and sends the exact same data back to the sender. This article explains how a UDP echo server works, provides a complete implementation in Python usin">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-to-write-a-simple-udp-echo-server">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Write a Simple UDP Echo Server - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-to-write-a-simple-udp-echo-server" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="A User Datagram Protocol (UDP) echo server is a network application that listens for incoming datagrams and sends the exact same data back to the sender. This article explains how a UDP echo server works, provides a complete implementation in Python usin" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-write-a-simple-udp-echo-server">How to Write a Simple UDP
+Echo Server</h1>
+<p>A User Datagram Protocol (UDP) echo server is a network application
+that listens for incoming datagrams and sends the exact same data back
+to the sender. This article explains how a UDP echo server works,
+provides a complete implementation in Python using the standard
+<code>socket</code> library, demonstrates a simple client for testing,
+and covers the core mechanics of connectionless socket programming.</p>
+<h2 id="understanding-the-udp-echo-model">Understanding the UDP Echo
+Model</h2>
+<p>Unlike TCP, UDP is a connectionless transport protocol. It does not
+establish a handshake, manage persistent connections, or guarantee
+packet delivery.</p>
+<p>A UDP echo server operates using a continuous loop with four core
+steps:</p>
+<ol type="1">
+<li>Create a socket configured for UDP (<code>SOCK_DGRAM</code>).</li>
+<li>Bind the socket to a specific IP address and port.</li>
+<li>Wait to receive a datagram along with the sender's network address
+using <code>recvfrom()</code>.</li>
+<li>Transmit the received data directly back to the sender's address
+using <code>sendto()</code>.</li>
+</ol>
+<h2 id="python-udp-echo-server-implementation">Python UDP Echo Server
+Implementation</h2>
+<p>Python's built-in <code>socket</code> module provides direct access
+to operating system networking primitives. Below is the complete server
+code:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> socket</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_udp_server(host<span class="op">=</span><span class="st">&quot;127.0.0.1&quot;</span>, port<span class="op">=</span><span class="dv">9999</span>):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Create a UDP socket (AF_INET for IPv4, SOCK_DGRAM for UDP)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    server_socket <span class="op">=</span> socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Bind the socket to the host address and port</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    server_socket.bind((host, port))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;UDP Echo Server listening on </span><span class="sc">{</span>host<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>port<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 3. Receive data and client address (buffer size 1024 bytes)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            data, client_address <span class="op">=</span> server_socket.recvfrom(<span class="dv">1024</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;Received </span><span class="sc">{</span><span class="bu">len</span>(data)<span class="sc">}</span><span class="ss"> bytes from </span><span class="sc">{</span>client_address<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>data<span class="sc">.</span>decode(<span class="st">&#39;utf-8&#39;</span>, errors<span class="op">=</span><span class="st">&#39;replace&#39;</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 4. Echo the received data back to the sender</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            server_socket.sendto(data, client_address)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">KeyboardInterrupt</span>:</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">Server shutting down.&quot;</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        server_socket.close()</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    run_udp_server()</span></code></pre></div>
+<h2 id="testing-with-a-udp-echo-client">Testing with a UDP Echo
+Client</h2>
+<p>To test the server, create a client script that sends a message and
+listens for the echoed response:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> socket</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_udp_client(host<span class="op">=</span><span class="st">&quot;127.0.0.1&quot;</span>, port<span class="op">=</span><span class="dv">9999</span>, message<span class="op">=</span><span class="st">&quot;Hello, UDP Server!&quot;</span>):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    client_socket <span class="op">=</span> socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    client_socket.settimeout(<span class="fl">2.0</span>)  <span class="co"># Set a timeout for response</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Send message</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        client_socket.sendto(message.encode(<span class="st">&quot;utf-8&quot;</span>), (host, port))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;Sent: </span><span class="sc">{</span>message<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Wait for echo response</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        response, _ <span class="op">=</span> client_socket.recvfrom(<span class="dv">1024</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;Echo received: </span><span class="sc">{</span>response<span class="sc">.</span>decode(<span class="st">&#39;utf-8&#39;</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> socket.timeout:</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Request timed out. No response from server.&quot;</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        client_socket.close()</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    run_udp_client()</span></code></pre></div>
+<h2 id="key-technical-considerations">Key Technical Considerations</h2>
+<ul>
+<li><strong>No <code>listen()</code> or <code>accept()</code>:</strong>
+TCP servers require <code>listen()</code> to queue connections and
+<code>accept()</code> to establish communication channels. UDP skips
+these steps because it processes individual packets rather than
+continuous streams.</li>
+<li><strong>Buffer Size:</strong> The <code>recvfrom(1024)</code> method
+sets the maximum packet payload size to read at once. If an incoming
+datagram exceeds this buffer, truncation or packet loss may occur
+depending on the operating system.</li>
+<li><strong>Statelessness:</strong> The server does not track client
+states. Every incoming packet is treated as an independent event
+containing both the payload and the origin address.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

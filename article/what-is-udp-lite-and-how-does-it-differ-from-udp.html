@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is UDP-Lite and How Does It Differ From UDP? - udp</title>
+    <meta name="description" content="UDP-Lite (Lightweight User Datagram Protocol) is a transport-layer protocol designed to deliver partially damaged data packets to applications rather than discarding them entirely. While standard UDP treats any bit error as a reason to drop an entire pac">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/what-is-udp-lite-and-how-does-it-differ-from-udp">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What is UDP-Lite and How Does It Differ From UDP? - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/what-is-udp-lite-and-how-does-it-differ-from-udp" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="UDP-Lite (Lightweight User Datagram Protocol) is a transport-layer protocol designed to deliver partially damaged data packets to applications rather than discarding them entirely. While standard UDP treats any bit error as a reason to drop an entire pac" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-udp-lite-and-how-does-it-differ-from-udp">What is
+UDP-Lite and How Does It Differ From UDP?</h1>
+<p>UDP-Lite (Lightweight User Datagram Protocol) is a transport-layer
+protocol designed to deliver partially damaged data packets to
+applications rather than discarding them entirely. While standard UDP
+treats any bit error as a reason to drop an entire packet, UDP-Lite
+introduces a flexible checksum mechanism that allows applications to
+receive payloads containing errors. This article explains what UDP-Lite
+is, how its partial checksum coverage works, its primary differences
+from traditional UDP, and the real-world scenarios where it offers
+distinct advantages.</p>
+<h2 id="what-is-udp-lite">What is UDP-Lite?</h2>
+<p>UDP-Lite, formalized in RFC 3828, is an extension of the classic User
+Datagram Protocol (UDP). In standard transport protocols,
+error-detection mechanisms ensure data integrity by validating both the
+packet header and the payload. If an error occurs during
+transmission—such as a bit flip caused by wireless interference—the
+transport layer drops the packet.</p>
+<p>UDP-Lite modifies this behavior for error-tolerant applications. It
+recognizes that certain types of data, particularly continuous media
+like audio and video, can still be processed effectively even if minor
+errors exist in the payload. Instead of discarding the whole packet,
+UDP-Lite allows the application layer to receive and process the
+slightly corrupted data.</p>
+<h2 id="how-the-partial-checksum-works">How the Partial Checksum
+Works</h2>
+<p>The primary innovation of UDP-Lite lies in how it handles the
+transport header. In standard UDP, the header contains a 16-bit
+<strong>Length</strong> field that indicates the total size of the
+header and payload.</p>
+<p>UDP-Lite replaces the Length field with a <strong>Checksum
+Coverage</strong> field:</p>
+<ul>
+<li><strong>Header Protection:</strong> The checksum must at minimum
+cover the 8-byte UDP-Lite header. This guarantees that critical routing
+and port information remains uncorrupted.</li>
+<li><strong>Partial Payload Protection:</strong> The application can
+specify that the checksum covers the header plus a specific number of
+sensitive payload bytes (such as codec control frames or sequence
+headers).</li>
+<li><strong>Full Payload Protection:</strong> If the Checksum Coverage
+value equals the total packet length (or is set to zero), UDP-Lite
+behaves like standard UDP, validating the entire datagram.</li>
+</ul>
+<p>If a bit error occurs in the protected zone, the packet is discarded.
+If an error occurs in the unprotected portion of the payload, the packet
+is delivered to the receiving application along with an error
+notification.</p>
+<h2 id="key-differences-between-udp-and-udp-lite">Key Differences
+Between UDP and UDP-Lite</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Standard UDP</th>
+<th style="text-align: left;">UDP-Lite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Protocol Number</strong></td>
+<td style="text-align: left;">17</td>
+<td style="text-align: left;">136</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Header Field (Bytes
+4–5)</strong></td>
+<td style="text-align: left;">Length</td>
+<td style="text-align: left;">Checksum Coverage</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Checksum Scope</strong></td>
+<td style="text-align: left;">Entire packet (or none in IPv4)</td>
+<td style="text-align: left;">Configurable (Header only, partial, or
+full)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Corrupted Packet
+Handling</strong></td>
+<td style="text-align: left;">Dropped immediately</td>
+<td style="text-align: left;">Delivered if errors are in the unprotected
+zone</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Application Control</strong></td>
+<td style="text-align: left;">All-or-nothing data validation</td>
+<td style="text-align: left;">Fine-grained data integrity
+management</td>
+</tr>
+</tbody>
+</table>
+<h2 id="use-cases-for-udp-lite">Use Cases for UDP-Lite</h2>
+<p>UDP-Lite is best suited for environments with high bit-error rates
+and applications designed to tolerate lossy data:</p>
+<ul>
+<li><strong>Real-Time Multimedia Streaming:</strong> Modern video and
+voice codecs (such as AMR or H.264) contain error-concealment
+algorithms. In low-bandwidth or noisy networks, displaying a frame with
+minor visual artifacts is preferable to dropping the frame entirely and
+causing playback stutter.</li>
+<li><strong>Wireless and Satellite Communication:</strong> Wireless
+links often suffer from interference that flips random bits. UDP-Lite
+avoids excessive packet loss over these links, reducing latency caused
+by frame drops.</li>
+<li><strong>Internet of Things (IoT) Sensor Streams:</strong> Low-power
+sensor networks transmitting non-critical, continuous telemetry can
+utilize UDP-Lite to maintain throughput over unstable radio
+connections.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

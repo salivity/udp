@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why UDP Relies on Application Layer Error Correction - udp</title>
+    <meta name="description" content="The User Datagram Protocol (UDP) is a lightweight, connectionless transport protocol engineered for low latency and minimal overhead rather than guaranteed delivery. Unlike the Transmission Control Protocol (TCP), which enforces strict reliability throug">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/why-udp-relies-on-application-layer-error-correction">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why UDP Relies on Application Layer Error Correction - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/why-udp-relies-on-application-layer-error-correction" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The User Datagram Protocol (UDP) is a lightweight, connectionless transport protocol engineered for low latency and minimal overhead rather than guaranteed delivery. Unlike the Transmission Control Protocol (TCP), which enforces strict reliability throug" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="why-udp-relies-on-application-layer-error-correction">Why UDP
+Relies on Application Layer Error Correction</h1>
+<p>The User Datagram Protocol (UDP) is a lightweight, connectionless
+transport protocol engineered for low latency and minimal overhead
+rather than guaranteed delivery. Unlike the Transmission Control
+Protocol (TCP), which enforces strict reliability through built-in
+retransmissions and packet sequencing, UDP delegates error correction to
+the application layer. This architectural decision prioritizes
+transmission speed, prevents head-of-line blocking, and gives developers
+the flexibility to implement only the specific error-handling mechanisms
+their applications actually require.</p>
+<h2 id="the-core-philosophy-of-udp-speed-and-low-overhead">The Core
+Philosophy of UDP: Speed and Low Overhead</h2>
+<p>UDP was designed under the end-to-end principle of network
+architecture. By stripping away connection handshakes, acknowledgments
+(ACKs), retransmissions, and flow control, UDP minimizes protocol
+overhead to an 8-byte header (compared to TCP's 20-byte minimum header).
+This design allows data packets (datagrams) to be transmitted
+immediately without the latency penalties associated with establishing
+and maintaining stateful connections.</p>
+<h2 id="error-detection-vs-error-correction">Error Detection vs. Error
+Correction</h2>
+<p>UDP does not entirely ignore errors; it includes a basic mechanism
+for error detection via an optional 16-bit checksum.</p>
+<ul>
+<li><strong>Error Detection:</strong> When a receiving host calculates a
+checksum mismatch, it identifies that a packet was corrupted in
+transit.</li>
+<li><strong>The Response:</strong> Instead of requesting a
+retransmission, UDP simply discards the corrupted datagram.</li>
+</ul>
+<p>Because UDP maintains no session state and does not track sequence
+numbers, it cannot independently request missing or corrupted data.
+Correcting these errors requires logic that exists outside the basic UDP
+transport mechanism.</p>
+<h2 id="preventing-head-of-line-blocking">Preventing Head-of-Line
+Blocking</h2>
+<p>In real-time network communications—such as live video streaming,
+Voice over IP (VoIP), and online gaming—late data is often useless
+data.</p>
+<p>If transport-level error correction were mandatory, a dropped packet
+would force the receiver to pause processing subsequent packets until
+the missing data is retransmitted (a phenomenon known as head-of-line
+blocking). By leaving error correction to the application layer,
+real-time applications can choose to simply ignore dropped packets and
+continue processing incoming live data seamlessly.</p>
+<h2 id="custom-error-handling-tailored-to-application-needs">Custom
+Error Handling Tailored to Application Needs</h2>
+<p>Leaving error recovery to the application layer allows developers to
+implement customized recovery strategies tailored to specific
+operational requirements:</p>
+<ul>
+<li><strong>Forward Error Correction (FEC):</strong> Applications can
+send redundant parity data alongside standard packets, allowing the
+receiver to reconstruct lost packets locally without requesting
+retransmissions.</li>
+<li><strong>Selective Retransmission:</strong> Instead of resending
+everything sequentially, an application can request only critical
+missing frames (such as keyframes in video feeds).</li>
+<li><strong>Application-Specific Protocols:</strong> Modern protocols
+like QUIC (which operates over UDP) build custom reliability, congestion
+control, and encryption layers directly in user space, avoiding the
+rigid constraints and kernel-level updates required by TCP.</li>
+</ul>
+<p>UDP offloads error correction to the application layer to maintain
+maximum performance, eliminate unnecessary network latency, and grant
+applications complete control over how data loss is handled.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

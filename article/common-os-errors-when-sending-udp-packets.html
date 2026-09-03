@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common OS Errors When Sending UDP Packets - udp</title>
+    <meta name="description" content="While the User Datagram Protocol (UDP) is a connectionless, best-effort transport protocol, the host operating system still performs local validation, memory allocation, routing lookups, and interface checks prior to transmitting a datagram. When an issu">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/common-os-errors-when-sending-udp-packets">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Common OS Errors When Sending UDP Packets - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/common-os-errors-when-sending-udp-packets" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="While the User Datagram Protocol (UDP) is a connectionless, best-effort transport protocol, the host operating system still performs local validation, memory allocation, routing lookups, and interface checks prior to transmitting a datagram. When an issu" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="common-os-errors-when-sending-udp-packets">Common OS Errors When
+Sending UDP Packets</h1>
+<p>While the User Datagram Protocol (UDP) is a connectionless,
+best-effort transport protocol, the host operating system still performs
+local validation, memory allocation, routing lookups, and interface
+checks prior to transmitting a datagram. When an issue occurs at the
+local socket layer, the network stack, or via an asynchronous ICMP
+response, the operating system returns specific error codes—typically
+defined via POSIX <code>errno</code> on Unix-like systems or Winsock
+error codes on Windows. Below are the most common OS errors encountered
+when sending UDP packets, their causes, and how to resolve them.</p>
+<h3 id="1-message-too-long-emsgsize--wsaemsgsize">1. Message Too Long
+(<code>EMSGSIZE</code> / <code>WSAEMSGSIZE</code>)</h3>
+<ul>
+<li><strong>Cause:</strong> The datagram size exceeds the maximum
+payload size supported by the local network interface's Maximum
+Transmission Unit (MTU), the socket's internal buffer limit, or the
+maximum theoretical limit of UDP (65,507 bytes for IPv4). It can also
+occur if the "Don't Fragment" (DF) bit is set and the packet size
+exceeds the path MTU.</li>
+<li><strong>Resolution:</strong> Reduce the size of the payload to fit
+within the standard MTU (commonly 1,500 bytes on Ethernet, resulting in
+a safe payload of ~1,472 bytes for IPv4), implement application-level
+fragmentation, or adjust socket buffer sizes.</li>
+</ul>
+<h3 id="2-no-buffer-space-available-enobufs--wsaenobufs">2. No Buffer
+Space Available (<code>ENOBUFS</code> / <code>WSAENOBUFS</code>)</h3>
+<ul>
+<li><strong>Cause:</strong> The operating system's outgoing network
+queues or socket send buffers are completely full. This happens when an
+application transmits UDP datagrams faster than the physical network
+interface or OS network stack can dispatch them.</li>
+<li><strong>Resolution:</strong> Increase the socket send buffer using
+<code>setsockopt</code> with the <code>SO_SNDBUF</code> option,
+rate-limit the application's transmission speed, or optimize the OS
+kernel's network queuing parameters.</li>
+</ul>
+<h3
+id="3-resource-temporarily-unavailable-eagain--ewouldblock--wsaewouldblock">3.
+Resource Temporarily Unavailable (<code>EAGAIN</code> /
+<code>EWOULDBLOCK</code> / <code>WSAEWOULDBLOCK</code>)</h3>
+<ul>
+<li><strong>Cause:</strong> Returned by non-blocking sockets when the
+send buffer is full and cannot immediately accept new data for
+transmission without blocking the thread.</li>
+<li><strong>Resolution:</strong> Use I/O multiplexing mechanisms (such
+as <code>epoll</code>, <code>kqueue</code>, <code>poll</code>, or
+<code>select</code>) to wait until the socket becomes writable again
+before attempting to send subsequent packets.</li>
+</ul>
+<h3 id="4-permission-denied-eacces--eperm--wsaeacces">4. Permission
+Denied (<code>EACCES</code> / <code>EPERM</code> /
+<code>WSAEACCES</code>)</h3>
+<ul>
+<li><strong>Cause:</strong> The application is attempting an operation
+restricted by local permissions or firewall rules. Common triggers
+include trying to send a broadcast packet to a subnet (e.g.,
+<code>255.255.255.255</code>) without enabling the
+<code>SO_BROADCAST</code> socket option, or being blocked by local
+packet filters (e.g., <code>iptables</code>, <code>nftables</code>, or
+Windows Defender Firewall).</li>
+<li><strong>Resolution:</strong> Explicitly enable
+<code>SO_BROADCAST</code> via <code>setsockopt</code> if sending
+broadcast traffic, or configure local firewall rules to permit outbound
+UDP traffic for the application.</li>
+</ul>
+<h3 id="5-connection-refused-econnrefused--wsaeconnrefused">5.
+Connection Refused (<code>ECONNREFUSED</code> /
+<code>WSAECONNREFUSED</code>)</h3>
+<ul>
+<li><strong>Cause:</strong> Although UDP is connectionless, if a socket
+is explicitly connected to a remote address using
+<code>connect()</code>, the OS can associate asynchronous incoming ICMP
+"Port Unreachable" (Type 3, Code 3) messages from previous transmissions
+with the socket. The next <code>send()</code> or <code>write()</code>
+call will then return this error.</li>
+<li><strong>Resolution:</strong> Verify that the destination host is
+active and that the target service is actively listening on the
+specified port.</li>
+</ul>
+<h3
+id="6-network-unreachable-enetunreach--wsaenetunreach-and-host-unreachable-ehostunreach--wsaehostunreach">6.
+Network Unreachable (<code>ENETUNREACH</code> /
+<code>WSAENETUNREACH</code>) and Host Unreachable
+(<code>EHOSTUNREACH</code> / <code>WSAEHOSTUNREACH</code>)</h3>
+<ul>
+<li><strong>Cause:</strong> The operating system cannot find a route to
+the destination IP address in its routing table
+(<code>ENETUNREACH</code>), or a local/remote router has returned an
+ICMP "Host Unreachable" message indicating the destination node is
+unreachable (<code>EHOSTUNREACH</code>).</li>
+<li><strong>Resolution:</strong> Check local network connectivity,
+ensure default gateways and routing tables are properly configured, and
+verify the destination IP address.</li>
+</ul>
+<h3 id="7-address-not-available-eaddrnotavail--wsaeaddrnotavail">7.
+Address Not Available (<code>EADDRNOTAVAIL</code> /
+<code>WSAEADDRNOTAVAIL</code>)</h3>
+<ul>
+<li><strong>Cause:</strong> The socket was bound to a local IP address
+or interface that does not exist on the host machine, or an ephemeral
+source port could not be allocated because the local port range is
+exhausted.</li>
+<li><strong>Resolution:</strong> Ensure the application binds to valid
+local IP addresses (or <code>INADDR_ANY</code> /
+<code>in6addr_any</code>), and tune ephemeral port range settings or
+recycle sockets to prevent port exhaustion.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

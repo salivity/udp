@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Header Fields in the UDP Pseudo-Header - udp</title>
+    <meta name="description" content="The UDP pseudo-header is a conceptual data structure used exclusively during the calculation of the UDP checksum. Rather than transmitting this data across the network, both the sender and receiver construct it in memory to verify that a datagram has rea">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/ip-header-fields-in-the-udp-pseudo-header">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="IP Header Fields in the UDP Pseudo-Header - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/ip-header-fields-in-the-udp-pseudo-header" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The UDP pseudo-header is a conceptual data structure used exclusively during the calculation of the UDP checksum. Rather than transmitting this data across the network, both the sender and receiver construct it in memory to verify that a datagram has rea" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="ip-header-fields-in-the-udp-pseudo-header">IP Header Fields in
+the UDP Pseudo-Header</h1>
+<p>The UDP pseudo-header is a conceptual data structure used exclusively
+during the calculation of the UDP checksum. Rather than transmitting
+this data across the network, both the sender and receiver construct it
+in memory to verify that a datagram has reached its correct destination
+without corruption. This article provides a straightforward breakdown of
+the specific Internet Protocol (IP) header fields borrowed to construct
+the UDP pseudo-header for both IPv4 and IPv6 networks.</p>
+<h2 id="purpose-of-the-pseudo-header">Purpose of the Pseudo-Header</h2>
+<p>The User Datagram Protocol (UDP) operates at the transport layer,
+while the Internet Protocol operates at the network layer. To protect
+against misrouted packets—such as those delivered to the wrong host due
+to routing table corruption or bit errors—the UDP checksum includes key
+addressing and protocol information from the IP header.</p>
+<h2 id="ipv4-header-fields-in-the-udp-pseudo-header">IPv4 Header Fields
+in the UDP Pseudo-Header</h2>
+<p>When calculating the UDP checksum over an IPv4 network, the
+pseudo-header is 12 bytes (96 bits) long and includes the following
+fields directly from the IPv4 header:</p>
+<ul>
+<li><strong>Source IP Address (32 bits / 4 bytes):</strong> Copied
+directly from the IPv4 header's Source Address field, representing the
+sender's IP address.</li>
+<li><strong>Destination IP Address (32 bits / 4 bytes):</strong> Copied
+directly from the IPv4 header's Destination Address field, representing
+the recipient's IP address.</li>
+<li><strong>Protocol (8 bits / 1 byte):</strong> Copied directly from
+the IPv4 header's Protocol field. For UDP, this value is fixed at
+<code>17</code> (or <code>0x11</code> in hexadecimal).</li>
+</ul>
+<h3 id="additional-ipv4-pseudo-header-fields">Additional IPv4
+Pseudo-Header Fields</h3>
+<p>Along with the fields taken from the IPv4 header, the pseudo-header
+contains:</p>
+<ul>
+<li><strong>Zero Padding (8 bits / 1 byte):</strong> A byte set entirely
+to zeros placed immediately before the Protocol field to align the
+structure to 16-bit boundaries.</li>
+<li><strong>UDP Length (16 bits / 2 bytes):</strong> The total length of
+the UDP header plus the UDP data (copied from the UDP header itself, not
+the IPv4 Total Length field).</li>
+</ul>
+<hr />
+<h2 id="ipv6-header-fields-in-the-udp-pseudo-header">IPv6 Header Fields
+in the UDP Pseudo-Header</h2>
+<p>In IPv6, calculating the UDP checksum is mandatory. The IPv6
+pseudo-header is 40 bytes long and extracts the following fields from
+the IPv6 base and extension headers:</p>
+<ul>
+<li><strong>Source IPv6 Address (128 bits / 16 bytes):</strong> The
+original source IP address. If a Routing extension header is present,
+this reflects the final source.</li>
+<li><strong>Destination IPv6 Address (128 bits / 16 bytes):</strong> The
+final destination IP address. If a Routing extension header is present,
+this is updated to reflect the final destination rather than an
+intermediate hop.</li>
+<li><strong>Next Header (8 bits / 1 byte):</strong> Copied from the
+<code>Next Header</code> field in the IPv6 header (or the preceding
+extension header). For UDP, this value is <code>17</code>
+(<code>0x11</code>).</li>
+</ul>
+<h3 id="additional-ipv6-pseudo-header-fields">Additional IPv6
+Pseudo-Header Fields</h3>
+<ul>
+<li><strong>UDP Length (32 bits / 4 bytes):</strong> The total length of
+the UDP header and its payload, represented as a 32-bit integer.</li>
+<li><strong>Zero Padding (24 bits / 3 bytes):</strong> A 3-byte block of
+zeros placed before the 8-bit Next Header field to ensure 32-bit
+alignment.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>The IP fields included in the UDP pseudo-header are the
+<strong>Source IP Address</strong>, the <strong>Destination IP
+Address</strong>, and the <strong>Protocol / Next Header</strong> field.
+These network-layer fields, combined with the transport layer's
+<strong>UDP Length</strong>, ensure that any error in addressing or
+transport identification invalidates the checksum and causes the
+corrupted datagram to be discarded.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

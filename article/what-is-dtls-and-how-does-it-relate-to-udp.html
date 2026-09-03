@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is DTLS and How Does It Relate to UDP? - udp</title>
+    <meta name="description" content="Datagram Transport Layer Security (DTLS) is a cryptographic protocol designed to provide communication security and privacy for datagram-based applications. While standard Transport Layer Security (TLS) secures reliable, connection-oriented streams over">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/what-is-dtls-and-how-does-it-relate-to-udp">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is DTLS and How Does It Relate to UDP? - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/what-is-dtls-and-how-does-it-relate-to-udp" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Datagram Transport Layer Security (DTLS) is a cryptographic protocol designed to provide communication security and privacy for datagram-based applications. While standard Transport Layer Security (TLS) secures reliable, connection-oriented streams over" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-dtls-and-how-does-it-relate-to-udp">What Is DTLS and How
+Does It Relate to UDP?</h1>
+<p>Datagram Transport Layer Security (DTLS) is a cryptographic protocol
+designed to provide communication security and privacy for
+datagram-based applications. While standard Transport Layer Security
+(TLS) secures reliable, connection-oriented streams over TCP, DTLS
+adapts these security mechanisms to run over datagram protocols like the
+User Datagram Protocol (UDP). This article explains what DTLS is, how it
+enables encryption and data integrity over UDP, how it handles packet
+loss and reordering, and where it is commonly applied in modern
+networking.</p>
+<h2
+id="understanding-datagram-transport-layer-security-dtls">Understanding
+Datagram Transport Layer Security (DTLS)</h2>
+<p>DTLS is an adaptation of the TLS protocol specifically engineered for
+unreliable transport layers. Standard TLS relies on TCP to guarantee
+in-order, reliable packet delivery. Because TCP handles packet
+retransmissions and reordering automatically, TLS assumes that records
+will arrive sequentially and intact.</p>
+<p>In contrast, UDP does not guarantee packet delivery, ordering, or
+protection against duplication. Standard TLS cannot function over UDP
+because a single lost or out-of-order packet would break the
+cryptographic stream. DTLS solves this problem by embedding mechanisms
+directly into the security layer to manage the unpredictable nature of
+datagram networks while providing the same core security guarantees as
+TLS: authentication, confidentiality, and data integrity.</p>
+<h2 id="how-dtls-relates-to-udp">How DTLS Relates to UDP</h2>
+<p>UDP is widely used for latency-sensitive applications—such as
+real-time audio/video streaming, gaming, and Internet of Things (IoT)
+sensors—where speed is critical and the overhead of TCP retransmissions
+is unacceptable. However, standard UDP provides zero built-in encryption
+or tamper protection.</p>
+<p>DTLS sits directly between UDP and the application layer, securing
+the datagrams without converting the connection into a heavyweight,
+reliable stream. It allows applications to maintain UDP's low-latency
+performance benefits while shielding data from eavesdropping, tampering,
+and message forgery.</p>
+<h2 id="key-mechanisms-in-dtls">Key Mechanisms in DTLS</h2>
+<p>To operate safely over an unreliable transport like UDP, DTLS
+introduces several architectural modifications to standard TLS:</p>
+<ul>
+<li><strong>Explicit Sequence Numbers:</strong> DTLS includes explicit
+sequence numbers within each record header. This allows the receiving
+side to decrypt individual datagrams independently, even if packets
+arrive out of order.</li>
+<li><strong>Handshake Retransmission Timers:</strong> During the initial
+cryptographic handshake, DTLS uses a retransmission timer. If a
+handshake packet is lost in transit, the sender detects the timeout and
+retransmits the missing handshake flight.</li>
+<li><strong>Replay Detection:</strong> To protect against attackers
+capturing and re-sending legitimate packets (replay attacks), DTLS
+maintains a sliding window mechanism based on the explicit sequence
+numbers.</li>
+<li><strong>Denial of Service (DoS) Countermeasures:</strong> Because
+UDP is susceptible to IP spoofing attacks, DTLS includes an optional
+stateless cookie exchange during the initial handshake. The server
+verifies that the client can receive packets at its claimed IP address
+before allocating expensive cryptographic resources.</li>
+</ul>
+<h2 id="dtls-vs-tls">DTLS vs. TLS</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">TLS</th>
+<th style="text-align: left;">DTLS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Transport Layer</strong></td>
+<td style="text-align: left;">TCP (Connection-Oriented)</td>
+<td style="text-align: left;">UDP / DCCP (Datagram-Based)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Packet Delivery</strong></td>
+<td style="text-align: left;">Assumes reliable, ordered delivery</td>
+<td style="text-align: left;">Handles lost and out-of-order packets</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Record Dependencies</strong></td>
+<td style="text-align: left;">Records depend on previous cipher
+state</td>
+<td style="text-align: left;">Records are decrypted independently</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Handshake
+Reliability</strong></td>
+<td style="text-align: left;">Handled by TCP layer</td>
+<td style="text-align: left;">Handled internally via timers and sequence
+numbers</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Primary Advantage</strong></td>
+<td style="text-align: left;">Complete data reliability</td>
+<td style="text-align: left;">Low latency and reduced transmission
+delay</td>
+</tr>
+</tbody>
+</table>
+<h2 id="common-use-cases-for-dtls">Common Use Cases for DTLS</h2>
+<p>DTLS is the industry standard for securing any network system that
+prioritizes throughput and speed over strict delivery guarantees:</p>
+<ul>
+<li><strong>WebRTC:</strong> Real-time communications in web browsers
+(audio, video, and data channels) use DTLS to secure peer-to-peer data
+streams.</li>
+<li><strong>Virtual Private Networks (VPNs):</strong> Technologies like
+OpenVPN and Cisco AnyConnect utilize DTLS over UDP to avoid TCP-over-TCP
+throughput degradation (TCP meltdown).</li>
+<li><strong>Internet of Things (IoT):</strong> Lightweight protocols
+such as the Constrained Application Protocol (CoAP) use DTLS to secure
+communications across resource-constrained devices and low-power
+networks.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

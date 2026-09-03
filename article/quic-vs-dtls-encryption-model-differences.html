@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIC vs DTLS: Encryption Model Differences - udp</title>
+    <meta name="description" content="This article examines the core differences between the encryption models of QUIC and Datagram Transport Layer Security (DTLS) over UDP. While both protocols provide cryptographic security for unreliable datagram transport, they differ fundamentally in th">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/quic-vs-dtls-encryption-model-differences">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="QUIC vs DTLS: Encryption Model Differences - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/quic-vs-dtls-encryption-model-differences" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines the core differences between the encryption models of QUIC and Datagram Transport Layer Security (DTLS) over UDP. While both protocols provide cryptographic security for unreliable datagram transport, they differ fundamentally in th" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="quic-vs-dtls-encryption-model-differences">QUIC vs DTLS:
+Encryption Model Differences</h1>
+<p>This article examines the core differences between the encryption
+models of QUIC and Datagram Transport Layer Security (DTLS) over UDP.
+While both protocols provide cryptographic security for unreliable
+datagram transport, they differ fundamentally in their architectural
+integration, header protection capabilities, handshake mechanisms, and
+resistance to network ossification and metadata leakage.</p>
+<h3 id="architectural-layering-vs-unified-transport">Architectural
+Layering vs. Unified Transport</h3>
+<p>The most fundamental difference lies in how security is layered
+within the protocol stack:</p>
+<ul>
+<li><strong>DTLS over UDP:</strong> DTLS operates as a distinct
+cryptographic layer layered strictly on top of UDP. It adapts the
+standard TLS protocol to handle packet loss and reordering independently
+of the application and underlying transport. The transport (UDP) and the
+security layer (DTLS) maintain separate states and packet framing.</li>
+<li><strong>QUIC:</strong> QUIC integrates TLS 1.3 directly into its
+transport layer. Rather than treating encryption as an encapsulation
+wrapper, QUIC uses TLS 1.3 for authentication and cryptographic key
+exchange, while handling the record framing, sequencing, and packet
+protection within the QUIC transport protocol itself.</li>
+</ul>
+<h3 id="header-protection-and-metadata-privacy">Header Protection and
+Metadata Privacy</h3>
+<p>A critical divergence between the two models is the visibility of
+transport metadata to intermediate network devices:</p>
+<ul>
+<li><strong>DTLS:</strong> Encrypts only the payload (the record data).
+Transport headers—such as UDP headers and DTLS record headers (including
+sequence numbers, epoch indicators, and record lengths)—remain exposed
+in plaintext. This allows middleboxes and eavesdroppers to analyze
+packet sequences, identify traffic patterns, and potentially tamper with
+transport-level data.</li>
+<li><strong>QUIC:</strong> Implements dual-layer encryption, encrypting
+both the payload and the majority of the transport packet headers. While
+a minimal public header (such as flags and Connection IDs) remains
+visible for routing, critical fields like the packet number are
+encrypted using a separate header protection key. This prevents network
+observers from tracking packet numbers, injecting spoofed control
+frames, or causing protocol ossification.</li>
+</ul>
+<h3 id="handshake-efficiency-and-state-management">Handshake Efficiency
+and State Management</h3>
+<p>The coordination between connection establishment and key exchange
+differs significantly in execution and latency:</p>
+<ul>
+<li><strong>DTLS Handshake:</strong> DTLS must implement its own
+reliability and fragmentation layer solely to transport TLS handshake
+messages reliably over UDP. Establishing a secure session requires
+completing the UDP initialization followed by a multi-round-trip DTLS
+handshake, adding latency before application data can be exchanged.</li>
+<li><strong>QUIC Handshake:</strong> QUIC leverages TLS 1.3 handshake
+state machines directly inside QUIC <code>CRYPTO</code> frames.
+Transport parameters (such as stream limits, flow control, and idle
+timeouts) are negotiated simultaneously with the cryptographic keys.
+This unified handshake enables 1-RTT connection establishment by default
+and 0-RTT connection resumption for previously seen peers.</li>
+</ul>
+<h3 id="stream-multiplexing-and-head-of-line-blocking">Stream
+Multiplexing and Head-of-Line Blocking</h3>
+<p>The relationship between encryption context and individual data
+streams affects transport performance:</p>
+<ul>
+<li><strong>DTLS:</strong> Encrypts data at the datagram record level.
+If an application multiplexes multiple logical streams over a single
+DTLS tunnel, packet loss on one stream can stall processing, or the
+application must implement its own per-stream framing atop DTLS.</li>
+<li><strong>QUIC:</strong> Supports native, multiple independent streams
+inside a single cryptographic connection. While keys protect entire QUIC
+packets, the transport layer maps individual stream frames
+independently. A dropped packet only blocks the specific stream
+containing that data, while other streams continue processing without
+cryptographic or transport-level head-of-line blocking.</li>
+</ul>
+<h3 id="connection-migration-and-identifiers">Connection Migration and
+Identifiers</h3>
+<ul>
+<li><strong>DTLS:</strong> Historically bound cryptographic sessions to
+the network 4-tuple (source IP, source port, destination IP, destination
+port). If a client changes networks (e.g., Wi-Fi to cellular), the
+session fails or requires full renegotiation, unless the optional DTLS
+Connection ID extension is explicitly supported and negotiated.</li>
+<li><strong>QUIC:</strong> Natively incorporates cryptographically
+verified Connection IDs (CIDs) independent of IP addresses and ports.
+When migrating connections across networks, QUIC securely updates path
+states using nonces and path validation frames, preventing off-path
+attackers from hijacking or resetting the migrated cryptographic
+session.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

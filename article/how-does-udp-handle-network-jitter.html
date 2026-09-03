@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Does UDP Handle Network Jitter? - udp</title>
+    <meta name="description" content="User Datagram Protocol (UDP) does not inherently handle network jitter due to its lightweight, connectionless design. Because UDP prioritizes transmission speed and low latency over reliability, it lacks built-in mechanisms to detect, manage, or correct">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-does-udp-handle-network-jitter">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Does UDP Handle Network Jitter? - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-does-udp-handle-network-jitter" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="User Datagram Protocol (UDP) does not inherently handle network jitter due to its lightweight, connectionless design. Because UDP prioritizes transmission speed and low latency over reliability, it lacks built-in mechanisms to detect, manage, or correct" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-does-udp-handle-network-jitter">How Does UDP Handle Network
+Jitter?</h1>
+<p>User Datagram Protocol (UDP) does not inherently handle network
+jitter due to its lightweight, connectionless design. Because UDP
+prioritizes transmission speed and low latency over reliability, it
+lacks built-in mechanisms to detect, manage, or correct timing
+variations in packet arrival. Consequently, applications relying on UDP
+must implement their own strategies—most notably jitter buffers and
+companion protocols like RTP—at the application layer to smooth out
+packet delivery fluctuations.</p>
+<h3 id="why-udp-does-not-manage-jitter">Why UDP Does Not Manage
+Jitter</h3>
+<p>UDP operates without state, flow control, or acknowledgment systems.
+When data is sent over UDP:</p>
+<ul>
+<li><strong>No Packet Ordering:</strong> Packets can arrive out of order
+if they take different network routes.</li>
+<li><strong>No Retransmission:</strong> Lost or delayed packets are
+simply dropped and not resent.</li>
+<li><strong>No Timing Metadata:</strong> UDP headers contain only
+source/destination ports, length, and a checksum—leaving no room for
+timestamps or sequence tracking.</li>
+</ul>
+<p>Because of this minimalism, UDP passes the raw network behavior
+directly to the receiving application, including any jitter (variable
+latency) introduced by intermediate routers and network congestion.</p>
+<h3 id="how-applications-manage-udp-jitter">How Applications Manage UDP
+Jitter</h3>
+<p>To achieve smooth playback in real-time environments like VoIP, video
+streaming, and online gaming, developers manage jitter above the
+transport layer using several key techniques:</p>
+<h4 id="1-jitter-buffers">1. Jitter Buffers</h4>
+<p>The primary defense against jitter is a jitter buffer (or de-jitter
+buffer) implemented on the receiving end.</p>
+<ul>
+<li>The receiver temporarily stores incoming UDP packets before
+processing them.</li>
+<li>By holding packets for a predetermined window (e.g., 20 to 50
+milliseconds), the buffer absorbs arrival-time variations.</li>
+<li>Packets are then fed to the audio/video decoder at a steady,
+predictable rate.</li>
+<li><strong>Adaptive Jitter Buffers:</strong> Advanced systems
+dynamically adjust buffer size based on current network conditions,
+minimizing latency when jitter is low and expanding the buffer when
+jitter spikes.</li>
+</ul>
+<h4 id="2-real-time-transport-protocol-rtp">2. Real-Time Transport
+Protocol (RTP)</h4>
+<p>Most multimedia applications wrap UDP payloads in RTP. RTP adds
+critical header information that UDP lacks:</p>
+<ul>
+<li><strong>Sequence Numbers:</strong> Allow the receiving application
+to detect lost packets and reorder misordered packets before
+playback.</li>
+<li><strong>Timestamps:</strong> Enable precise synchronization and
+calculation of inter-arrival jitter, informing the jitter buffer when a
+packet should ideally be rendered.</li>
+</ul>
+<h4 id="3-packet-concealment-and-forward-error-correction-fec">3. Packet
+Concealment and Forward Error Correction (FEC)</h4>
+<p>When jitter causes a packet to arrive too late for its playback
+deadline, applications treat it as lost. To prevent audio or video
+stutter, applications use:</p>
+<ul>
+<li><strong>Packet Loss Concealment (PLC):</strong> Interpolates missing
+data using audio signals immediately before and after the missing
+frame.</li>
+<li><strong>Forward Error Correction (FEC):</strong> Sends redundant
+error-correction data alongside media streams, allowing the receiver to
+reconstruct delayed or missing packets without waiting for
+retransmission.</li>
+</ul>
+<h3 id="summary">Summary</h3>
+<p>UDP handles network jitter by delegating the entire problem to the
+application layer. By omitting sequence tracking and buffering at the
+transport level, UDP ensures the lowest possible baseline latency,
+allowing real-time applications to use jitter buffers and RTP timestamps
+to balance latency against stream smoothness according to their specific
+needs.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

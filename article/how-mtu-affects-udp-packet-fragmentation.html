@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How MTU Affects UDP Packet Fragmentation - udp</title>
+    <meta name="description" content="The Maximum Transmission Unit (MTU) defines the largest size of a data packet that a network layer can transmit without breaking it apart. When a User Datagram Protocol (UDP) packet exceeds the MTU of a network path, the Internet Protocol (IP) layer must">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-mtu-affects-udp-packet-fragmentation">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How MTU Affects UDP Packet Fragmentation - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-mtu-affects-udp-packet-fragmentation" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The Maximum Transmission Unit (MTU) defines the largest size of a data packet that a network layer can transmit without breaking it apart. When a User Datagram Protocol (UDP) packet exceeds the MTU of a network path, the Internet Protocol (IP) layer must" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-mtu-affects-udp-packet-fragmentation">How MTU Affects UDP
+Packet Fragmentation</h1>
+<p>The Maximum Transmission Unit (MTU) defines the largest size of a
+data packet that a network layer can transmit without breaking it apart.
+When a User Datagram Protocol (UDP) packet exceeds the MTU of a network
+path, the Internet Protocol (IP) layer must fragment the packet into
+smaller pieces to ensure successful delivery. This article explains the
+relationship between MTU and UDP, how the fragmentation process works,
+the performance and reliability risks associated with it, and strategies
+to prevent fragmentation in network applications.</p>
+<h3 id="understanding-mtu-and-udp-overhead">Understanding MTU and UDP
+Overhead</h3>
+<p>In standard Ethernet networks, the default MTU is typically 1,500
+bytes. This limit includes both the packet payload and its headers:</p>
+<ul>
+<li><strong>IPv4 Header:</strong> 20 bytes (standard)</li>
+<li><strong>UDP Header:</strong> 8 bytes</li>
+<li><strong>Maximum UDP Payload:</strong> 1,472 bytes (<span
+class="math inline">\(1500 - 20 - 8\)</span>)</li>
+</ul>
+<p>If an application generates a UDP payload larger than 1,472 bytes (or
+larger than 1,452 bytes on IPv6, which uses a 40-byte header), the total
+packet size exceeds the 1,500-byte MTU. Because UDP is a connectionless,
+datagram-based protocol that does not manage packet sizing or
+segmentation on its own, it relies entirely on the underlying IP layer
+to handle oversized data.</p>
+<h3 id="the-ip-fragmentation-process">The IP Fragmentation Process</h3>
+<p>When a UDP packet exceeds the MTU of either the sending interface or
+an intermediate router along the network path, IP fragmentation
+occurs:</p>
+<ol type="1">
+<li><strong>Splitting the Payload:</strong> The IP layer divides the
+original UDP datagram into two or more smaller IP packets that fit
+within the path's MTU limit.</li>
+<li><strong>Header Generation:</strong> Each fragment receives a new IP
+header. The original UDP header is only contained within the first
+fragment; subsequent fragments contain only raw payload data following
+their IP headers.</li>
+<li><strong>Tracking and Offsets:</strong> The IP header uses three
+fields to manage the fragments:
+<ul>
+<li><strong>Identification:</strong> A unique identifier shared by all
+fragments of the same original packet.</li>
+<li><strong>Fragment Offset:</strong> Indicates the position of the
+fragment's data relative to the start of the original datagram.</li>
+<li><strong>More Fragments (MF) Flag:</strong> Set to <code>1</code> for
+all fragments except the final one, which is set to <code>0</code>.</li>
+</ul></li>
+<li><strong>Reassembly:</strong> The receiving host buffers the incoming
+fragments until all pieces arrive, reconstructs the original UDP
+datagram, and passes it up to the application layer.</li>
+</ol>
+<h3 id="consequences-and-risks-of-udp-fragmentation">Consequences and
+Risks of UDP Fragmentation</h3>
+<p>While fragmentation allows large datagrams to traverse restrictive
+links, it introduces several significant network problems:</p>
+<ul>
+<li><strong>Amplified Packet Loss:</strong> UDP does not have built-in
+retransmission mechanisms. If a single IP fragment is dropped in
+transit, the destination host cannot reassemble the datagram and must
+discard the entire packet.</li>
+<li><strong>Firewall and NAT Traversal Issues:</strong> Many modern
+firewalls, routers, and Network Address Translation (NAT) devices
+inspect transport-layer headers (UDP ports) to apply security rules.
+Because fragments after the first do not contain the UDP header,
+middleboxes frequently drop them, leading to complete communication
+failure.</li>
+<li><strong>Increased Latency and CPU Overhead:</strong> Routers and
+receiving endpoints expend extra memory and processing power to
+fragment, buffer, and reassemble packets, which can degrade throughput
+and increase jitter.</li>
+</ul>
+<h3 id="best-practices-to-prevent-udp-fragmentation">Best Practices to
+Prevent UDP Fragmentation</h3>
+<p>To maintain optimal performance and reliability, applications relying
+on UDP should avoid fragmentation using the following approaches:</p>
+<ul>
+<li><strong>Limit Payload Size:</strong> Restrict application payload
+sizes so the total packet remains comfortably below standard MTU limits.
+A common safe default for IPv4 over the public internet is 1,200 to
+1,400 bytes, or 512 bytes for legacy systems (such as standard
+DNS).</li>
+<li><strong>Packetization Layer Path MTU Discovery (PLPMTUD):</strong>
+Implement application-level probing to dynamically discover the actual
+MTU of the end-to-end network path and adjust datagram sizes
+accordingly.</li>
+<li><strong>Set the Don't Fragment (DF) Bit:</strong> Setting the DF
+flag in the IP header forces routers to discard oversized packets and
+send back an ICMP "Fragmentation Needed" message, alerting the sender to
+reduce packet size rather than silently fragmenting.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

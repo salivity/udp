@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How UDP Handles Multiplexing and Demultiplexing - udp</title>
+    <meta name="description" content="User Datagram Protocol (UDP) facilitates the transmission of multiple data streams across a single network interface by utilizing multiplexing and demultiplexing. Through the use of 16-bit port numbers combined with IP addresses, UDP gathers data from va">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-udp-handles-multiplexing-and-demultiplexing">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How UDP Handles Multiplexing and Demultiplexing - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-udp-handles-multiplexing-and-demultiplexing" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="User Datagram Protocol (UDP) facilitates the transmission of multiple data streams across a single network interface by utilizing multiplexing and demultiplexing. Through the use of 16-bit port numbers combined with IP addresses, UDP gathers data from va" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-udp-handles-multiplexing-and-demultiplexing">How UDP Handles
+Multiplexing and Demultiplexing</h1>
+<p>User Datagram Protocol (UDP) facilitates the transmission of multiple
+data streams across a single network interface by utilizing multiplexing
+and demultiplexing. Through the use of 16-bit port numbers combined with
+IP addresses, UDP gathers data from various application processes,
+packages it into datagrams for transmission, and subsequently directs
+incoming packets from the network layer to the precise target
+application on the receiving host.</p>
+<h3
+id="understanding-transport-layer-multiplexing-and-demultiplexing">Understanding
+Transport Layer Multiplexing and Demultiplexing</h3>
+<p>On any active host, multiple network-enabled applications run
+concurrently (such as DNS clients, video streaming applications, and
+online gaming services). Multiplexing and demultiplexing are the
+mechanisms that allow these distinct applications to share a single
+physical network connection without cross-talk or data collisions.</p>
+<ul>
+<li><strong>Multiplexing (Sender Side):</strong> The process of
+collecting data from multiple application processes via their respective
+sockets, appending transport-layer headers to create UDP datagrams, and
+passing these datagrams to the underlying network layer (IP).</li>
+<li><strong>Demultiplexing (Receiver Side):</strong> The process of
+inspecting the transport-layer header of an incoming datagram from the
+network layer, identifying the intended recipient process, and
+delivering the payload directly to the correct application socket.</li>
+</ul>
+<h3 id="the-role-of-udp-headers-in-traffic-routing">The Role of UDP
+Headers in Traffic Routing</h3>
+<p>UDP relies on a minimal 8-byte header to perform its transport
+duties. Two specific fields within this header make multiplexing and
+demultiplexing possible:</p>
+<ol type="1">
+<li><strong>Source Port Number (16 bits):</strong> Identifies the
+sending application process on the source host. This allows the
+receiving host to know where to send a reply if necessary.</li>
+<li><strong>Destination Port Number (16 bits):</strong> Identifies the
+target application process on the destination host.</li>
+</ol>
+<p>Port numbers range from <code>0</code> to <code>65535</code>. Ports
+<code>0</code> to <code>1023</code> are well-known ports reserved for
+standard services (e.g., DNS on port 53), while ports <code>1024</code>
+to <code>65535</code> are used for dynamic or private application
+assignments.</p>
+<h3 id="the-udp-multiplexing-process-sending-data">The UDP Multiplexing
+Process (Sending Data)</h3>
+<p>When an application wants to transmit data using UDP:</p>
+<ol type="1">
+<li><strong>Socket Creation:</strong> The operating system assigns a
+local port number to the application's UDP socket.</li>
+<li><strong>Datagram Encapsulation:</strong> The UDP layer accepts the
+raw data payload from the application layer.</li>
+<li><strong>Header Generation:</strong> UDP adds the assigned source
+port and the specified destination port, along with the length and
+checksum fields.</li>
+<li><strong>Handoff to Network Layer:</strong> The encapsulated datagram
+is passed down to the IP layer, which wraps it in an IP packet
+containing the source and destination IP addresses before transmitting
+it over the physical network.</li>
+</ol>
+<h3 id="the-udp-demultiplexing-process-receiving-data">The UDP
+Demultiplexing Process (Receiving Data)</h3>
+<p>UDP performs <strong>connectionless demultiplexing</strong>. Unlike
+TCP, which uses a 4-tuple to identify a socket, UDP demultiplexes
+traffic using a <strong>2-tuple</strong>:</p>
+<p><span class="math display">\[\text{UDP Identifier} =
+(\text{Destination IP Address}, \text{Destination Port
+Number})\]</span></p>
+<p>When an incoming IP packet arrives at the receiving host:</p>
+<ol type="1">
+<li><strong>Packet Extraction:</strong> The network layer strips the IP
+header and passes the encapsulated UDP datagram up to the transport
+layer.</li>
+<li><strong>Port Inspection:</strong> The transport layer examines the
+datagram's <strong>Destination Port Number</strong>.</li>
+<li><strong>Socket Matching:</strong> The host matches the destination
+IP address and destination port to the local socket bound to that
+port.</li>
+<li><strong>Data Delivery:</strong> The UDP payload is placed into the
+specific socket's receive buffer, where the corresponding application
+reads it.</li>
+</ol>
+<p>Because UDP is connectionless, two incoming datagrams with different
+source IP addresses or source port numbers—but directed to the same
+destination IP and destination port—will be delivered to the exact same
+application socket on the receiving host. The application itself can
+read the source IP and source port from the packet metadata if it needs
+to differentiate between individual senders.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

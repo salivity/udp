@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risks of Accepting Fragmented UDP Packets - udp</title>
+    <meta name="description" content="Accepting fragmented UDP (User Datagram Protocol) packets introduces significant security and performance vulnerabilities to networked systems and security appliances. Because UDP is a stateless, connectionless protocol, splitting datagrams across multip">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/risks-of-accepting-fragmented-udp-packets">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Risks of Accepting Fragmented UDP Packets - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/risks-of-accepting-fragmented-udp-packets" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Accepting fragmented UDP (User Datagram Protocol) packets introduces significant security and performance vulnerabilities to networked systems and security appliances. Because UDP is a stateless, connectionless protocol, splitting datagrams across multip" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="risks-of-accepting-fragmented-udp-packets">Risks of Accepting
+Fragmented UDP Packets</h1>
+<p>Accepting fragmented UDP (User Datagram Protocol) packets introduces
+significant security and performance vulnerabilities to networked
+systems and security appliances. Because UDP is a stateless,
+connectionless protocol, splitting datagrams across multiple IP packets
+creates blind spots that attackers regularly exploit. The primary risks
+of processing these fragments include firewall and intrusion detection
+evasion, denial-of-service (DoS) attacks via resource exhaustion, and
+OS-level vulnerabilities stemming from overlapping or malformed fragment
+reassembly.</p>
+<h3 id="security-appliance-evasion">Security Appliance Evasion</h3>
+<p>When an IP packet is fragmented, the Layer 4 (UDP) header is only
+present in the first fragment (offset 0). Subsequent fragments contain
+only the Layer 3 (IP) header and the remaining data payload, completely
+lacking source and destination port numbers.</p>
+<p>This design creates significant evasion risks:</p>
+<ul>
+<li><strong>Stateless Firewall Bypass:</strong> Firewalls relying on
+standard access control lists (ACLs) based on port numbers cannot
+accurately inspect non-initial fragments. They may let malicious
+payloads pass through to the internal network.</li>
+<li><strong>IDS/IPS Blindness:</strong> Intrusion Detection and
+Prevention Systems that do not perform full packet reassembly in memory
+cannot inspect malicious signatures spread across fragmented payloads,
+allowing malicious traffic to reach internal targets undetected.</li>
+</ul>
+<h3 id="denial-of-service-dos-and-resource-exhaustion">Denial of Service
+(DoS) and Resource Exhaustion</h3>
+<p>Reassembling fragmented packets requires the receiving host or
+intermediate firewall to allocate memory buffers and CPU cycles to store
+fragments until the entire datagram arrives. Attackers exploit this
+reassembly mechanism to stage denial-of-service attacks:</p>
+<ul>
+<li><strong>Fragment Flooding (Buffer Exhaustion):</strong> An attacker
+can flood a target with non-initial fragments or intentionally
+incomplete fragment sets. The target holds these incomplete fragments in
+memory waiting for a timeout period, rapidly depleting memory and
+connection tracking tables.</li>
+<li><strong>CPU Saturation:</strong> Forcing a firewall or host to
+track, sort, and reassemble high volumes of out-of-order fragments
+consumes processing power, degrading overall network throughput.</li>
+</ul>
+<h3
+id="exploitation-via-malformed-and-overlapping-fragments">Exploitation
+via Malformed and Overlapping Fragments</h3>
+<p>Attackers can craft malformed fragment parameters to exploit
+vulnerabilities in the target operating system's network stack during
+the reassembly phase:</p>
+<ul>
+<li><strong>Teardrop Attacks:</strong> The attacker sends fragments with
+overlapping offset fields. When the receiving operating system attempts
+to reassemble the data, incorrect offset calculations can cause buffer
+overflows, kernel panics, or system crashes.</li>
+<li><strong>Overlap Manipulation:</strong> Attackers can send an initial
+benign fragment followed by an overlapping fragment that overwrites part
+of the original data. If a firewall inspects the initial fragment but
+the end host reassembles the modified version, the security inspection
+is entirely undermined.</li>
+</ul>
+<h3 id="ip-spoofing-and-amplification-exposure">IP Spoofing and
+Amplification Exposure</h3>
+<p>Because UDP does not utilize a handshake mechanism, the source IP
+address in fragmented packets is trivial to spoof. Attackers can
+leverage fragmented UDP traffic in distributed reflection
+denial-of-service (DRDoS) attacks, such as DNS or NTP amplification. The
+large, fragmented responses generated by open reflectors overwhelm the
+victim’s network infrastructure while complicating packet filtering and
+mitigation efforts.</p>
+<h3 id="recommended-mitigation-strategies">Recommended Mitigation
+Strategies</h3>
+<p>To minimize the risks associated with fragmented UDP packets, network
+administrators should:</p>
+<ul>
+<li>Drop fragmented UDP packets at the perimeter firewall if network
+applications do not explicitly require fragmentation.</li>
+<li>Implement Path MTU Discovery (PMTUD) and tune application payload
+sizes (such as DNS response buffers) to stay below standard MTU limits
+(e.g., 1500 bytes).</li>
+<li>Enable virtual defragmentation on stateful firewalls and intrusion
+prevention devices to ensure all fragments are inspected as a whole
+before forwarding them to internal endpoints.</li>
+<li>Enforce strict fragment timeout limits and rate limiting for
+incomplete fragment queues at the operating system and router
+levels.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

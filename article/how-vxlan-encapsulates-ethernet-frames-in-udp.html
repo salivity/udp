@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How VXLAN Encapsulates Ethernet Frames in UDP - udp</title>
+    <meta name="description" content="Virtual Extensible LAN (VXLAN) is an overlay network technology designed to extend Layer 2 network domains over an underlying Layer 3 IP network. This article explains how VXLAN performs encapsulation by packaging original Ethernet frames inside standard">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-vxlan-encapsulates-ethernet-frames-in-udp">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How VXLAN Encapsulates Ethernet Frames in UDP - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-vxlan-encapsulates-ethernet-frames-in-udp" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Virtual Extensible LAN (VXLAN) is an overlay network technology designed to extend Layer 2 network domains over an underlying Layer 3 IP network. This article explains how VXLAN performs encapsulation by packaging original Ethernet frames inside standard" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-vxlan-encapsulates-ethernet-frames-in-udp">How VXLAN
+Encapsulates Ethernet Frames in UDP</h1>
+<p>Virtual Extensible LAN (VXLAN) is an overlay network technology
+designed to extend Layer 2 network domains over an underlying Layer 3 IP
+network. This article explains how VXLAN performs encapsulation by
+packaging original Ethernet frames inside standard User Datagram
+Protocol (UDP) packets, detailing the role of Virtual Tunnel Endpoints
+(VTEPs), the step-by-step encapsulation workflow, and the structure of
+the resulting network packet.</p>
+<h3 id="the-role-of-virtual-tunnel-endpoints-vteps">The Role of Virtual
+Tunnel Endpoints (VTEPs)</h3>
+<p>The encapsulation and decapsulation processes are handled by Virtual
+Tunnel Endpoints (VTEPs). A VTEP is a network entity—implemented in
+software on a hypervisor or in hardware on a switch/router—that connects
+the virtualized Layer 2 overlay to the physical Layer 3 underlay
+network.</p>
+<p>Each VTEP has an IP address on the underlay network. When a device
+(such as a virtual machine or container) transmits a frame intended for
+another device in the same broadcast domain across the network, the
+local VTEP intercepts the frame and encapsulates it for transport.</p>
+<h3 id="step-by-step-encapsulation-process">Step-by-Step Encapsulation
+Process</h3>
+<ol type="1">
+<li><strong>Frame Capture:</strong> The source host generates a standard
+Ethernet frame containing its source MAC address, the destination MAC
+address, and the payload (such as an IP packet). The local VTEP captures
+this frame.</li>
+<li><strong>Lookup and Mapping:</strong> The VTEP inspects the
+destination MAC address and the local VLAN/port configuration. It maps
+the local network to a 24-bit VXLAN Network Identifier (VNI) and queries
+its forwarding table to identify the IP address of the destination VTEP
+hosting the target MAC address.</li>
+<li><strong>Adding the VXLAN Header:</strong> The VTEP prepends an
+8-byte VXLAN header to the original Ethernet frame. This header includes
+dynamic control flags and the 24-bit VNI, which allows for up to 16
+million distinct Layer 2 segments.</li>
+<li><strong>Adding the UDP Header:</strong> An 8-byte UDP header is
+placed around the VXLAN payload.
+<ul>
+<li><strong>Destination Port:</strong> Standardized to UDP port 4789
+(assigned by IANA).</li>
+<li><strong>Source Port:</strong> Calculated dynamically using a hash of
+the inner frame’s headers (such as source and destination IP and MAC
+addresses). This enables equal-cost multi-path (ECMP) routing and load
+balancing across the physical underlay without inspecting the inner
+frame.</li>
+</ul></li>
+<li><strong>Adding Outer IP and Ethernet Headers:</strong>
+<ul>
+<li>An <strong>Outer IP Header</strong> (20 bytes for IPv4) is added,
+where the source IP is the local VTEP and the destination IP is the
+remote VTEP.</li>
+<li>An <strong>Outer Ethernet Header</strong> (14 bytes) is added with
+the MAC addresses corresponding to the local physical next-hop gateway
+in the underlay network.</li>
+</ul></li>
+</ol>
+<h3 id="the-encapsulated-packet-structure">The Encapsulated Packet
+Structure</h3>
+<p>From outermost layer to innermost layer, a fully encapsulated VXLAN
+packet contains:</p>
+<ul>
+<li><strong>Outer Ethernet Header:</strong> Contains source and
+destination MAC addresses for underlay routing.</li>
+<li><strong>Outer IP Header:</strong> Contains source and destination
+VTEP IP addresses.</li>
+<li><strong>Outer UDP Header:</strong> Destination port set to 4789;
+source port hashed for load balancing.</li>
+<li><strong>VXLAN Header:</strong> 8 bytes containing the 24-bit
+VNI.</li>
+<li><strong>Inner Ethernet Frame:</strong> The complete, unmodified
+original Layer 2 frame (Original MAC header, Original IP header,
+Payload, and CRC).</li>
+</ul>
+<p>Because the entire original frame is wrapped inside this structure,
+VXLAN adds 50 bytes of overhead (or 54 bytes if an outer 802.1Q VLAN tag
+is used). Consequently, underlay physical networks typically require a
+Maximum Transmission Unit (MTU) of at least 1550 or 1600 bytes (Jumbo
+Frames) to avoid packet fragmentation.</p>
+<h3 id="the-decapsulation-process">The Decapsulation Process</h3>
+<p>Once the packet traverses the Layer 3 underlay and reaches the
+destination VTEP:</p>
+<ol type="1">
+<li>The destination VTEP inspects the outer IP header and the UDP
+destination port (4789).</li>
+<li>Recognizing it as VXLAN traffic, the VTEP strips off the outer
+Ethernet, IP, UDP, and VXLAN headers.</li>
+<li>The VTEP validates the VNI to ensure the frame belongs to an
+authorized local segment.</li>
+<li>The inner, original Layer 2 Ethernet frame is forwarded directly to
+the destination virtual machine or port without any modification.</li>
+</ol></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typical UDP Packet Receive Buffer Size in Code - udp</title>
+    <meta name="description" content="When writing networking code to handle UDP traffic, developers must configure two types of buffers: the application-level memory buffer passed to read functions and the operating system's kernel socket receive buffer. In application code, the most common">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/typical-udp-packet-receive-buffer-size-in-code">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Typical UDP Packet Receive Buffer Size in Code - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/typical-udp-packet-receive-buffer-size-in-code" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When writing networking code to handle UDP traffic, developers must configure two types of buffers: the application-level memory buffer passed to read functions and the operating system's kernel socket receive buffer. In application code, the most common" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="typical-udp-packet-receive-buffer-size-in-code">Typical UDP
+Packet Receive Buffer Size in Code</h1>
+<p>When writing networking code to handle UDP traffic, developers must
+configure two types of buffers: the application-level memory buffer
+passed to read functions and the operating system's kernel socket
+receive buffer. In application code, the most common buffer allocation
+is either <strong>65,536 bytes (64 KB)</strong> to safely capture the
+maximum possible UDP packet without data loss or <strong>2,048 bytes (2
+KB)</strong> when targeting standard non-fragmented Ethernet
+traffic.</p>
+<h3 id="application-level-receive-buffer-sizes">Application-Level
+Receive Buffer Sizes</h3>
+<p>The application buffer is the memory array passed into system calls
+like <code>recv()</code> or <code>recvfrom()</code>. Because UDP is a
+message-oriented protocol, each receive call retrieves exactly one
+entire datagram. If the allocated buffer is smaller than the incoming
+packet, the excess data is truncated and discarded.</p>
+<ul>
+<li><strong>65,535 or 65,536 Bytes (64 KB):</strong> This is the safest
+and most standard size for general-purpose applications. The theoretical
+maximum payload for an IPv4 UDP packet is 65,507 bytes (65,535 bytes
+maximum IP packet size minus 20 bytes for the IP header and 8 bytes for
+the UDP header). Allocating 64 KB guarantees that no packet will ever be
+truncated, regardless of network fragmentation or jumbo frames.</li>
+<li><strong>1,500 to 2,048 Bytes:</strong> This size is standard for
+high-performance applications designed for local networks or the public
+internet where packets are constrained by the standard Maximum
+Transmission Unit (MTU) of 1,500 bytes. Because internet paths typically
+avoid IP fragmentation, UDP payloads rarely exceed 1,472 bytes (1,500
+byte MTU minus 28 bytes of headers). A 2 KB buffer safely accommodates
+full MTU datagrams while minimizing memory overhead per thread or
+connection.</li>
+<li><strong>4,096 or 8,192 Bytes (4 KB / 8 KB):</strong> Often used in
+custom application protocols as a balanced default. These sizes align
+with standard operating system memory page boundaries and comfortably
+accommodate multi-frame protocols or small jumbo frames.</li>
+</ul>
+<h3 id="kernel-level-socket-receive-buffer-so_rcvbuf">Kernel-Level
+Socket Receive Buffer (<code>SO_RCVBUF</code>)</h3>
+<p>The kernel-level buffer queues incoming UDP packets before the
+application processes them. Unlike TCP, UDP does not have flow control;
+if the kernel buffer fills up, subsequent incoming packets are dropped
+immediately.</p>
+<ul>
+<li><strong>Default OS Sizes:</strong> Most operating systems set
+default UDP socket buffer sizes between <strong>64 KB and 256
+KB</strong>.</li>
+<li><strong>High-Throughput / High-Bandwidth Sizes:</strong> For
+high-throughput systems (such as video streaming, gaming servers, or
+financial data feeds), developers typically increase the socket receive
+buffer using the <code>SO_RCVBUF</code> socket option to between
+<strong>2 MB and 16 MB</strong> (or higher) to absorb traffic spikes
+without packet loss.</li>
+</ul>
+<h3 id="recommendation-summary">Recommendation Summary</h3>
+<p>For general programming, allocate a <strong>65,536-byte
+buffer</strong> for your <code>recvfrom()</code> call to prevent
+truncation errors. If optimizing for low memory footprint across
+thousands of concurrent listeners on standard networks, allocate
+<strong>2,048 bytes</strong>. If handling bursty, high-bandwidth
+streams, keep the application buffer large and expand the kernel
+<code>SO_RCVBUF</code> to several megabytes.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

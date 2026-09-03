@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How UDP Encapsulates Application Data - udp</title>
+    <meta name="description" content="User Datagram Protocol (UDP) encapsulation is the transport-layer process of packaging raw application data into self-contained units known as datagrams. This article outlines how an application's message is wrapped with a streamlined 8-byte UDP header,">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-udp-encapsulates-application-data">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How UDP Encapsulates Application Data - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-udp-encapsulates-application-data" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="User Datagram Protocol (UDP) encapsulation is the transport-layer process of packaging raw application data into self-contained units known as datagrams. This article outlines how an application's message is wrapped with a streamlined 8-byte UDP header," />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-udp-encapsulates-application-data">How UDP Encapsulates
+Application Data</h1>
+<p>User Datagram Protocol (UDP) encapsulation is the transport-layer
+process of packaging raw application data into self-contained units
+known as datagrams. This article outlines how an application's message
+is wrapped with a streamlined 8-byte UDP header, how specific header
+fields define the transmission parameters, and how the resulting
+datagram is handed down to the Internet Protocol (IP) layer for network
+routing.</p>
+<h3 id="the-encapsulation-process">The Encapsulation Process</h3>
+<p>When an application needs to send data over a network using UDP, the
+data moves down the Open Systems Interconnection (OSI) model from the
+Application Layer (Layer 7) to the Transport Layer (Layer 4). UDP does
+not divide data into streams or track state; instead, it treats the
+entire message provided by the application as a single, discrete
+payload.</p>
+<p>UDP performs encapsulation through the following steps:</p>
+<ol type="1">
+<li><strong>Data Reception:</strong> The application passes a block of
+data (such as a DNS query, VoIP audio frame, or video packet) down to
+the transport layer via a network socket.</li>
+<li><strong>Header Construction:</strong> UDP generates an 8-byte
+(64-bit) header containing routing and integrity information.</li>
+<li><strong>Payload Attachment:</strong> The application data is
+appended directly behind the 8-byte header, forming the complete UDP
+datagram.</li>
+<li><strong>Handoff to Layer 3:</strong> The fully assembled UDP
+datagram is passed to the Network Layer (IPv4 or IPv6), where it is
+treated entirely as payload data and wrapped in an IP header.</li>
+</ol>
+<h3 id="the-udp-header-structure">The UDP Header Structure</h3>
+<p>The UDP header is intentionally minimal to reduce latency and
+processing overhead. It consists of four distinct fields, each 2 bytes
+(16 bits) in length:</p>
+<ul>
+<li><strong>Source Port (16 bits):</strong> Identifies the sending
+application or process on the source host. This field is optional; if
+not used, it is set to zero.</li>
+<li><strong>Destination Port (16 bits):</strong> Identifies the
+receiving process or service on the destination host (e.g., port 53 for
+DNS).</li>
+<li><strong>Length (16 bits):</strong> Specifies the total length of the
+UDP datagram in bytes, including both the 8-byte header and the
+application payload. The minimum value is 8 (a datagram with zero
+payload bytes).</li>
+<li><strong>Checksum (16 bits):</strong> Provides error-checking for the
+header and payload data. It is calculated using the UDP header, the
+payload, and a conceptual "pseudo-header" derived from the IP layer
+(source IP, destination IP, and protocol number). While optional in
+IPv4, the checksum is mandatory in IPv6.</li>
+</ul>
+<h3 id="key-characteristics-of-udp-encapsulation">Key Characteristics of
+UDP Encapsulation</h3>
+<ul>
+<li><strong>Preservation of Message Boundaries:</strong> Unlike TCP,
+which provides a continuous byte stream, UDP maintains distinct message
+boundaries. One write operation by the sending application results in
+exactly one UDP datagram, which is read as a single unit by the
+receiving application.</li>
+<li><strong>No Inherent Fragmentation:</strong> UDP encapsulation does
+not fragment large data blocks into smaller segments at Layer 4. If the
+total datagram size exceeds the network's Maximum Transmission Unit
+(MTU), fragmentation is deferred to the underlying IP layer (Layer
+3).</li>
+<li><strong>Zero Handshake Overhead:</strong> Because encapsulation does
+not require connection setup, sequence numbers, or acknowledgment
+tracking, the application data is encapsulated and transmitted
+immediately.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is the Primary Difference Between UDP and TCP? - udp</title>
+    <meta name="description" content="This article provides a concise overview of the core differences between Transmission Control Protocol (TCP) and User Datagram Protocol (UDP), two foundational protocols of the internet suite. It explores how each protocol manages data transmission, comp">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/what-is-the-primary-difference-between-udp-and-tcp">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is the Primary Difference Between UDP and TCP? - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/what-is-the-primary-difference-between-udp-and-tcp" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article provides a concise overview of the core differences between Transmission Control Protocol (TCP) and User Datagram Protocol (UDP), two foundational protocols of the internet suite. It explores how each protocol manages data transmission, comp" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-the-primary-difference-between-udp-and-tcp">What Is the
+Primary Difference Between UDP and TCP?</h1>
+<p>This article provides a concise overview of the core differences
+between Transmission Control Protocol (TCP) and User Datagram Protocol
+(UDP), two foundational protocols of the internet suite. It explores how
+each protocol manages data transmission, comparing their mechanisms
+regarding reliability, speed, and connection establishment to help you
+understand which protocol fits specific networking use cases.</p>
+<p>The primary difference between TCP and UDP is that TCP is a
+connection-oriented, reliable protocol that guarantees data delivery,
+while UDP is a connectionless, lightweight protocol focused on speed
+without delivery guarantees.</p>
+<h3 id="tcp-reliable-and-connection-oriented">TCP: Reliable and
+Connection-Oriented</h3>
+<p>TCP requires a formal connection to be established between the sender
+and receiver before any data is transferred. This is accomplished via a
+"three-way handshake" (SYN, SYN-ACK, ACK).</p>
+<p>Key characteristics of TCP include:</p>
+<ul>
+<li><strong>Guaranteed Delivery:</strong> TCP tracks every sent packet
+and requires acknowledgment from the receiving end. If a packet is lost
+in transit, TCP automatically retransmits it.</li>
+<li><strong>In-Order Delivery:</strong> Packets are numbered
+sequentially. If packets arrive out of order, the receiving system
+reassembles them in the correct sequence.</li>
+<li><strong>Error Checking and Flow Control:</strong> TCP includes
+robust error-checking mechanisms and manages data flow to prevent
+overwhelming the receiver.</li>
+<li><strong>Higher Overhead:</strong> The handshakes, acknowledgments,
+and tracking headers increase latency and use more bandwidth.</li>
+</ul>
+<p><strong>Common TCP Use Cases:</strong> Web browsing (HTTP/HTTPS),
+file transfers (FTP), email (SMTP/IMAP), and secure shell access
+(SSH).</p>
+<h3 id="udp-fast-and-connectionless">UDP: Fast and Connectionless</h3>
+<p>UDP does not establish a dedicated end-to-end connection before
+transmitting data. It uses a "fire-and-forget" approach, sending packets
+(called datagrams) directly to the target destination without verifying
+if the receiver is ready or if the data arrived safely.</p>
+<p>Key characteristics of UDP include:</p>
+<ul>
+<li><strong>No Delivery Guarantees:</strong> UDP does not confirm
+receipt of packets and does not retransmit lost data.</li>
+<li><strong>No Packet Ordering:</strong> Datagrams may arrive out of
+order, duplicated, or not at all.</li>
+<li><strong>Low Latency and Minimal Overhead:</strong> Without
+connection setups, acknowledgments, or sequence management, UDP provides
+significantly faster transmission speeds and consumes fewer system
+resources.</li>
+</ul>
+<p><strong>Common UDP Use Cases:</strong> Real-time online gaming, live
+video streaming, Voice over IP (VoIP), and Domain Name System (DNS)
+queries.</p>
+<h3 id="summary-comparison">Summary Comparison</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">TCP</th>
+<th style="text-align: left;">UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Connection Type</strong></td>
+<td style="text-align: left;">Connection-oriented (Handshake
+required)</td>
+<td style="text-align: left;">Connectionless (No handshake)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Reliability</strong></td>
+<td style="text-align: left;">Guaranteed (Retransmits lost data)</td>
+<td style="text-align: left;">Best-effort (No retransmission)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Data Ordering</strong></td>
+<td style="text-align: left;">Packets arrive in order</td>
+<td style="text-align: left;">Packets may arrive out of order</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Speed</strong></td>
+<td style="text-align: left;">Slower due to overhead</td>
+<td style="text-align: left;">Faster with minimal latency</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Header Size</strong></td>
+<td style="text-align: left;">20 to 60 bytes</td>
+<td style="text-align: left;">Fixed 8 bytes</td>
+</tr>
+</tbody>
+</table>
+<p>In short, TCP is the standard choice when data integrity and
+completeness are critical, whereas UDP is preferred when speed and
+real-time responsiveness are prioritized over absolute accuracy.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

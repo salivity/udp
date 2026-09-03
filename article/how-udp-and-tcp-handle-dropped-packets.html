@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How UDP and TCP Handle Dropped Packets - udp</title>
+    <meta name="description" content="When network congestion or hardware issues occur, data packets often get dropped in transit. Transmission Control Protocol (TCP) and User Datagram Protocol (UDP) manage these lost packets in fundamentally opposite ways. TCP guarantees delivery by detecti">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-udp-and-tcp-handle-dropped-packets">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How UDP and TCP Handle Dropped Packets - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-udp-and-tcp-handle-dropped-packets" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When network congestion or hardware issues occur, data packets often get dropped in transit. Transmission Control Protocol (TCP) and User Datagram Protocol (UDP) manage these lost packets in fundamentally opposite ways. TCP guarantees delivery by detecti" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-udp-and-tcp-handle-dropped-packets">How UDP and TCP Handle
+Dropped Packets</h1>
+<p>When network congestion or hardware issues occur, data packets often
+get dropped in transit. Transmission Control Protocol (TCP) and User
+Datagram Protocol (UDP) manage these lost packets in fundamentally
+opposite ways. TCP guarantees delivery by detecting missing packets and
+retransmitting them until they are successfully received, prioritizing
+data integrity over speed. In contrast, UDP uses a "fire-and-forget"
+approach that completely ignores dropped packets, choosing not to detect
+or resend lost data in order to maintain maximum speed and minimal
+latency.</p>
+<h2 id="how-tcp-handles-dropped-packets">How TCP Handles Dropped
+Packets</h2>
+<p>TCP is a connection-oriented, reliable protocol designed to ensure
+that data arrives intact, complete, and in the correct order. When a
+packet is lost during a TCP transmission, the protocol relies on several
+built-in mechanisms to recover it:</p>
+<ul>
+<li><strong>Sequence Numbers and Acknowledgments:</strong> Every TCP
+segment is assigned a sequence number. When the receiving device gets a
+packet, it sends back an acknowledgment (ACK) containing the next
+sequence number it expects.</li>
+<li><strong>Retransmission Timeouts (RTO):</strong> The sender runs a
+timer for each sent packet. If an ACK is not received before the timer
+expires, the sender assumes the packet was dropped and automatically
+retransmits it.</li>
+<li><strong>Fast Retransmit:</strong> If the receiver detects a missing
+packet in the sequence, it sends duplicate ACKs for the last correctly
+received packet. Receiving three duplicate ACKs triggers the sender to
+retransmit the missing packet immediately, without waiting for the timer
+to expire.</li>
+<li><strong>Congestion Control:</strong> Dropped packets signal network
+congestion to TCP. When a loss occurs, TCP intentionally reduces its
+transmission rate (via its congestion window) to alleviate network
+stress before ramping back up.</li>
+</ul>
+<p>Because of this error-recovery overhead, TCP is ideal for
+applications where data completeness is non-negotiable, such as web
+browsing (HTTP/HTTPS), file downloads (FTP), and email (SMTP).</p>
+<h2 id="how-udp-handles-dropped-packets">How UDP Handles Dropped
+Packets</h2>
+<p>UDP is a connectionless, lightweight protocol that eliminates the
+overhead of tracking and error correction. Its approach to dropped
+packets is straightforward:</p>
+<ul>
+<li><strong>No Acknowledgments:</strong> UDP senders do not ask for,
+expect, or process receipt confirmations from the destination
+device.</li>
+<li><strong>No Retransmission:</strong> When a UDP packet is dropped by
+a router or network switch, the sender is never notified. The lost data
+is simply gone, and no retransmission attempt is made by the
+protocol.</li>
+<li><strong>No Congestion Throttling:</strong> UDP does not adjust its
+transmission rate in response to packet loss; it continues to send
+packets at the pace determined by the application.</li>
+<li><strong>Application-Level Handling:</strong> If packet recovery is
+necessary in a UDP-based system, the responsibility falls entirely on
+the application layer, not the transport layer. The software itself must
+detect missing data and decide whether to request it again.</li>
+</ul>
+<p>By skipping delivery verification and retransmissions, UDP avoids
+head-of-line blocking—a delay where newer data must wait for older,
+dropped packets to be resent. This makes UDP the preferred choice for
+real-time applications such as live video streaming, voice-over-IP
+(VoIP), and multiplayer online gaming, where receiving outdated data is
+useless and low latency is critical.</p>
+<h2 id="key-differences-summary">Key Differences Summary</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">TCP</th>
+<th style="text-align: left;">UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Loss Detection</strong></td>
+<td style="text-align: left;">Automatic via sequence numbers and missing
+ACKs</td>
+<td style="text-align: left;">None at the transport layer</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Response to Loss</strong></td>
+<td style="text-align: left;">Retransmits the missing packet</td>
+<td style="text-align: left;">Ignores the loss and continues
+transmitting</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Packet Ordering</strong></td>
+<td style="text-align: left;">Reassembles packets in exact order before
+delivery</td>
+<td style="text-align: left;">Delivers packets as they arrive,
+regardless of order</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Impact of Loss</strong></td>
+<td style="text-align: left;">Causes latency while waiting for
+retransmission</td>
+<td style="text-align: left;">Maintains real-time speed; application
+tolerates data gaps</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Network Adaptation</strong></td>
+<td style="text-align: left;">Slows down transmission during packet
+loss</td>
+<td style="text-align: left;">Maintains transmission rate regardless of
+loss</td>
+</tr>
+</tbody>
+</table></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

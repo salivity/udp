@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDP vs TCP Connection Establishment Latency - udp</title>
+    <meta name="description" content="When comparing network protocols, connection establishment latency is a critical factor in overall performance. User Datagram Protocol (UDP) offers substantially lower connection establishment latency than Transmission Control Protocol (TCP) because UDP">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/udp-vs-tcp-connection-establishment-latency">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="UDP vs TCP Connection Establishment Latency - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/udp-vs-tcp-connection-establishment-latency" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When comparing network protocols, connection establishment latency is a critical factor in overall performance. User Datagram Protocol (UDP) offers substantially lower connection establishment latency than Transmission Control Protocol (TCP) because UDP" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="udp-vs-tcp-connection-establishment-latency">UDP vs TCP
+Connection Establishment Latency</h1>
+<p>When comparing network protocols, connection establishment latency is
+a critical factor in overall performance. User Datagram Protocol (UDP)
+offers substantially lower connection establishment latency than
+Transmission Control Protocol (TCP) because UDP is entirely
+connectionless and requires zero initial setup time, while TCP
+introduces an unavoidable delay due to its mandatory three-way handshake
+before any application data can be transmitted.</p>
+<h2 id="tcp-connection-establishment-latency">TCP Connection
+Establishment Latency</h2>
+<p>TCP is a connection-oriented protocol designed for reliability.
+Before any actual data can be transferred between a client and a server,
+TCP must establish a reliable virtual circuit.</p>
+<p>This process relies on the <strong>TCP Three-Way
+Handshake</strong>:</p>
+<ol type="1">
+<li><strong>SYN</strong>: The client sends a synchronization packet to
+the server to request a connection.</li>
+<li><strong>SYN-ACK</strong>: The server responds with a
+synchronization-acknowledgment packet to acknowledge the request.</li>
+<li><strong>ACK</strong>: The client sends back an acknowledgment packet
+to confirm the connection is established.</li>
+</ol>
+<p>This handshake requires a full <strong>1 Round-Trip Time (1
+RTT)</strong> of latency before the first byte of payload data can be
+processed. If the connection also involves security layers such as
+TLS/SSL, additional handshakes occur, increasing the initial latency to
+2 or 3 RTTs before application data flows.</p>
+<h2 id="udp-connection-establishment-latency">UDP Connection
+Establishment Latency</h2>
+<p>UDP is a connectionless protocol designed for speed and low overhead.
+It does not perform a handshake, establish a dedicated session, or
+verify that the receiving endpoint is ready to accept data.</p>
+<p>Key characteristics of UDP setup:</p>
+<ul>
+<li><strong>0-RTT Latency</strong>: The client can send data packets
+immediately in the very first transmission.</li>
+<li><strong>No State Initialization</strong>: Neither endpoint needs to
+allocate resources or track connection states prior to sending
+datagrams.</li>
+<li><strong>Fire-and-Forget Architecture</strong>: Packets are
+transmitted instantly to the destination address without waiting for a
+ready signal.</li>
+</ul>
+<h2 id="direct-comparison-of-setup-latency">Direct Comparison of Setup
+Latency</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">TCP</th>
+<th style="text-align: left;">UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Initial Latency</strong></td>
+<td style="text-align: left;">1 RTT (plus TLS if applicable)</td>
+<td style="text-align: left;">0 RTT</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Setup Mechanism</strong></td>
+<td style="text-align: left;">Three-way handshake (SYN, SYN-ACK,
+ACK)</td>
+<td style="text-align: left;">None (Connectionless)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Time to First Data</strong></td>
+<td style="text-align: left;">After at least 1 round trip</td>
+<td style="text-align: left;">Instantaneous</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Reliability Check</strong></td>
+<td style="text-align: left;">High (Verifies receiver availability)</td>
+<td style="text-align: left;">None (Best-effort delivery)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="practical-impact-on-applications">Practical Impact on
+Applications</h2>
+<p>The difference between 1 RTT and 0 RTT becomes significant in
+high-latency environments (such as satellite or mobile networks) and in
+real-time applications:</p>
+<ul>
+<li><strong>Real-Time Applications (VoIP, Online Gaming, Live
+Video)</strong>: UDP is preferred because avoiding the initial setup
+delay and continuous acknowledgment overhead ensures the lowest possible
+latency.</li>
+<li><strong>Standard Web and File Transfers (HTTP, FTP, Email)</strong>:
+TCP is preferred because the initial 1 RTT penalty is an acceptable
+trade-off for guaranteed packet delivery, ordered data streams, and
+error correction.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

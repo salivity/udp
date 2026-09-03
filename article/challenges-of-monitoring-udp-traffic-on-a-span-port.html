@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenges of Monitoring UDP Traffic on a SPAN Port - udp</title>
+    <meta name="description" content="Monitoring User Datagram Protocol (UDP) traffic via a Switched Port Analyzer (SPAN) port is a common practice for network visibility, security monitoring, and troubleshooting. However, combining the connectionless, stateless nature of UDP with the inhere">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/challenges-of-monitoring-udp-traffic-on-a-span-port">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Challenges of Monitoring UDP Traffic on a SPAN Port - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/challenges-of-monitoring-udp-traffic-on-a-span-port" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Monitoring User Datagram Protocol (UDP) traffic via a Switched Port Analyzer (SPAN) port is a common practice for network visibility, security monitoring, and troubleshooting. However, combining the connectionless, stateless nature of UDP with the inhere" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="challenges-of-monitoring-udp-traffic-on-a-span-port">Challenges
+of Monitoring UDP Traffic on a SPAN Port</h1>
+<p>Monitoring User Datagram Protocol (UDP) traffic via a Switched Port
+Analyzer (SPAN) port is a common practice for network visibility,
+security monitoring, and troubleshooting. However, combining the
+connectionless, stateless nature of UDP with the inherent limitations of
+hardware port mirroring introduces significant operational hurdles. This
+article explores the primary challenges engineers face when analyzing
+UDP traffic on a SPAN port, including buffer oversubscription, the
+absence of flow control, loss of packet sequencing, and inaccurate
+performance metrics.</p>
+<h3 id="1-span-port-oversubscription-and-silent-packet-loss">1. SPAN
+Port Oversubscription and Silent Packet Loss</h3>
+<p>The most critical challenge is port oversubscription. A SPAN port
+typically aggregates traffic from multiple sources (e.g., several 1 Gbps
+full-duplex interfaces) into a single destination port. When the
+aggregated bandwidth exceeds the destination port's capacity, the switch
+drops mirrored packets.</p>
+<p>Because UDP does not utilize sequence numbers or acknowledgments like
+TCP, network analyzers cannot detect whether a missing UDP packet was
+lost on the live network or dropped internally by the SPAN port buffer.
+This leads to false positives during troubleshooting and blind spots in
+security monitoring.</p>
+<h3 id="2-lack-of-flow-state-and-delivery-confirmation">2. Lack of Flow
+State and Delivery Confirmation</h3>
+<p>Unlike TCP, UDP provides no connection setup (three-way handshake),
+teardown, or flow control. For monitoring tools capturing data from a
+SPAN port:</p>
+<ul>
+<li><strong>Session Tracking is Difficult:</strong> Tools must rely on
+arbitrary timeout thresholds to define the start and end of a UDP
+"conversation."</li>
+<li><strong>Asymmetric Routing Complications:</strong> If request and
+response packets traverse different paths, the SPAN port may only
+capture one direction of the traffic, making it impossible to infer
+whether the destination ever received or processed the datagram.</li>
+</ul>
+<h3 id="3-vulnerability-to-microbursts">3. Vulnerability to
+Microbursts</h3>
+<p>UDP is frequently used for high-throughput, latency-sensitive
+applications such as video streaming, VoIP, multicast market data feeds,
+and bulk Syslog collection. These applications frequently generate
+microbursts—short, intense spikes in traffic that saturate switch
+buffers within milliseconds. Switches prioritize production traffic over
+SPAN traffic, causing mirrored UDP packets to be the first to be
+discarded during microburst events.</p>
+<h3 id="4-timestamp-distortion-and-jitter-inaccuracies">4. Timestamp
+Distortion and Jitter Inaccuracies</h3>
+<p>Accurate packet timing is crucial when monitoring UDP-based real-time
+protocols like RTP (Real-time Transport Protocol) for VoIP and video.
+When packets are duplicated to a SPAN port, they are subject to internal
+switch scheduling delays and queuing. This introduces artificial latency
+and jitter into the mirrored stream, leading monitoring tools to report
+degraded Quality of Service (QoS) metrics that do not reflect the actual
+user experience on the production path.</p>
+<h3 id="5-out-of-order-packets-and-ip-fragmentation">5. Out-of-Order
+Packets and IP Fragmentation</h3>
+<p>Large UDP datagrams that exceed the Maximum Transmission Unit (MTU)
+are fragmented at the IP layer. If fragments are mirrored across heavily
+loaded switch fabrics:</p>
+<ul>
+<li>Fragments can arrive at the capture tool out of order or be
+partially dropped.</li>
+<li>Without the initial fragment containing the UDP header (source and
+destination ports), monitoring tools cannot identify the application
+layer protocol or associate subsequent fragments with the correct
+session.</li>
+</ul>
+<h3 id="6-security-blind-spots">6. Security Blind Spots</h3>
+<p>Network Intrusion Detection Systems (NIDS) connected to SPAN ports
+rely on complete packet streams to detect malicious behavior, such as
+UDP floods, DNS amplification attacks, or data exfiltration. If the SPAN
+port drops packets due to high load, security tools will fail to
+reassemble payloads, potentially missing indicators of compromise (IoCs)
+and signature matches.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

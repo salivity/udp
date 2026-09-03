@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Implement Non-Blocking UDP Sockets - udp</title>
+    <meta name="description" content="Implementing non-blocking UDP sockets allows applications to handle high-throughput, low-latency network traffic without halting execution threads during I/O operations. This guide covers how to set a standard UDP socket to non-blocking mode, handle asyn">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-to-implement-non-blocking-udp-sockets">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Implement Non-Blocking UDP Sockets - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-to-implement-non-blocking-udp-sockets" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Implementing non-blocking UDP sockets allows applications to handle high-throughput, low-latency network traffic without halting execution threads during I/O operations. This guide covers how to set a standard UDP socket to non-blocking mode, handle asyn" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-implement-non-blocking-udp-sockets">How to Implement
+Non-Blocking UDP Sockets</h1>
+<p>Implementing non-blocking UDP sockets allows applications to handle
+high-throughput, low-latency network traffic without halting execution
+threads during I/O operations. This guide covers how to set a standard
+UDP socket to non-blocking mode, handle asynchronous read and write
+calls, manage operating-system-specific error codes, and use I/O
+multiplexing mechanisms like <code>epoll</code> or <code>select</code>
+to build scalable network applications.</p>
+<h3 id="1-create-a-standard-udp-socket">1. Create a Standard UDP
+Socket</h3>
+<p>First, instantiate a standard datagram socket using the POSIX
+<code>socket()</code> function:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> sockfd <span class="op">=</span> socket<span class="op">(</span>AF_INET<span class="op">,</span> SOCK_DGRAM<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>sockfd <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    perror<span class="op">(</span><span class="st">&quot;Socket creation failed&quot;</span><span class="op">);</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="2-enable-non-blocking-mode">2. Enable Non-Blocking Mode</h3>
+<p>By default, network sockets are created in blocking mode. To switch
+to non-blocking mode, modify the socket flags using the
+<code>fcntl</code> function on POSIX systems:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> flags <span class="op">=</span> fcntl<span class="op">(</span>sockfd<span class="op">,</span> F_GETFL<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>flags <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    perror<span class="op">(</span><span class="st">&quot;fcntl F_GETFL failed&quot;</span><span class="op">);</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>fcntl<span class="op">(</span>sockfd<span class="op">,</span> F_SETFL<span class="op">,</span> flags <span class="op">|</span> O_NONBLOCK<span class="op">)</span> <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    perror<span class="op">(</span><span class="st">&quot;fcntl F_SETFL failed&quot;</span><span class="op">);</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><em>Note: On Windows (Winsock), use
+<code>ioctlsocket(sockfd, FIONBIO, &amp;mode)</code> where
+<code>mode = 1</code>.</em></p>
+<h3 id="3-handle-recvfrom-and-non-blocking-errors">3. Handle
+<code>recvfrom</code> and Non-Blocking Errors</h3>
+<p>When reading from a non-blocking UDP socket with
+<code>recvfrom()</code>, the call returns immediately regardless of
+whether data is available:</p>
+<ul>
+<li><strong>If data is present:</strong> <code>recvfrom()</code> returns
+the number of bytes read.</li>
+<li><strong>If no data is present:</strong> It returns <code>-1</code>,
+and sets <code>errno</code> to either <code>EAGAIN</code> or
+<code>EWOULDBLOCK</code>.</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> buffer<span class="op">[</span><span class="dv">1024</span><span class="op">];</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> sockaddr_in client_addr<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>socklen_t addr_len <span class="op">=</span> <span class="kw">sizeof</span><span class="op">(</span>client_addr<span class="op">);</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">ssize_t</span> bytes_received <span class="op">=</span> recvfrom<span class="op">(</span>sockfd<span class="op">,</span> buffer<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>buffer<span class="op">),</span> <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                                  <span class="op">(</span><span class="kw">struct</span> sockaddr<span class="op">*)&amp;</span>client_addr<span class="op">,</span> <span class="op">&amp;</span>addr_len<span class="op">);</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>bytes_received <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>errno <span class="op">==</span> EAGAIN <span class="op">||</span> errno <span class="op">==</span> EWOULDBLOCK<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">// No data available right now; proceed with other tasks</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        perror<span class="op">(</span><span class="st">&quot;recvfrom error&quot;</span><span class="op">);</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Process incoming packet</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="4-handle-sendto-operations">4. Handle <code>sendto</code>
+Operations</h3>
+<p>UDP sending is generally immediate, but outbound kernel buffers can
+fill up. When using <code>sendto()</code> on a non-blocking socket:</p>
+<ul>
+<li>If the buffer cannot accept the packet, <code>sendto()</code>
+returns <code>-1</code> with <code>errno</code> set to
+<code>EAGAIN</code> or <code>EWOULDBLOCK</code>.</li>
+<li>Retry transmission later or drop the packet depending on your
+application's reliability requirements.</li>
+</ul>
+<h3 id="5-use-io-multiplexing-event-loops">5. Use I/O Multiplexing
+(Event Loops)</h3>
+<p>Continuous polling in a loop causes high CPU utilization. To handle
+I/O efficiently, integrate the non-blocking socket with an event-driven
+mechanism:</p>
+<ul>
+<li><strong><code>select()</code> or <code>poll()</code>:</strong>
+Cross-platform and suitable for a small number of sockets.</li>
+<li><strong><code>epoll</code> (Linux):</strong> Highly scalable event
+notification mechanism for large-scale applications.</li>
+<li><strong><code>kqueue</code> (BSD/macOS):</strong> Scalable
+kernel-event notification system.</li>
+</ul>
+<p>Example using <code>poll()</code> to wait for incoming packets:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;poll.h&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> pollfd fds<span class="op">[</span><span class="dv">1</span><span class="op">];</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>fds<span class="op">[</span><span class="dv">0</span><span class="op">].</span>fd <span class="op">=</span> sockfd<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>fds<span class="op">[</span><span class="dv">0</span><span class="op">].</span>events <span class="op">=</span> POLLIN<span class="op">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> timeout_ms <span class="op">=</span> <span class="dv">100</span><span class="op">;</span> <span class="co">// Wait up to 100ms</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> ret <span class="op">=</span> poll<span class="op">(</span>fds<span class="op">,</span> <span class="dv">1</span><span class="op">,</span> timeout_ms<span class="op">);</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>ret <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> <span class="op">(</span>fds<span class="op">[</span><span class="dv">0</span><span class="op">].</span>revents <span class="op">&amp;</span> POLLIN<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Socket is ready to read without blocking</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    recvfrom<span class="op">(</span>sockfd<span class="op">,</span> buffer<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>buffer<span class="op">),</span> <span class="dv">0</span><span class="op">,</span> <span class="op">(</span><span class="kw">struct</span> sockaddr<span class="op">*)&amp;</span>client_addr<span class="op">,</span> <span class="op">&amp;</span>addr_len<span class="op">);</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

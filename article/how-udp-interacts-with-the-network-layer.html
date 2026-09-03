@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How UDP Interacts With the Network Layer - udp</title>
+    <meta name="description" content="The User Datagram Protocol (UDP) operates at the Transport layer of the OSI and TCP/IP models, relying directly on the underlying Network layer—specifically the Internet Protocol (IP)—to transport data between hosts. This article explains how UDP coo">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-udp-interacts-with-the-network-layer">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How UDP Interacts With the Network Layer - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-udp-interacts-with-the-network-layer" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The User Datagram Protocol (UDP) operates at the Transport layer of the OSI and TCP/IP models, relying directly on the underlying Network layer—specifically the Internet Protocol (IP)—to transport data between hosts. This article explains how UDP coo" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-udp-interacts-with-the-network-layer">How UDP Interacts With
+the Network Layer</h1>
+<p>The User Datagram Protocol (UDP) operates at the Transport layer of
+the OSI and TCP/IP models, relying directly on the underlying Network
+layer—specifically the Internet Protocol (IP)—to transport data between
+hosts. This article explains how UDP coordinates with the Network layer
+through packet encapsulation, port-to-address mapping, protocol
+identification, and fragmentation management to deliver lightweight,
+connectionless communication across networks.</p>
+<h2 id="encapsulation-and-data-transfer">Encapsulation and Data
+Transfer</h2>
+<p>When an application sends data via UDP, the transport protocol
+packages the payload by adding an 8-byte header containing four fields:
+Source Port, Destination Port, Length, and Checksum. Once constructed,
+UDP passes this datagram down to the Network layer.</p>
+<p>The Network layer treats the entire UDP datagram as raw payload data.
+It encapsulates the datagram within an IP packet by attaching its own
+header, which includes source and destination IP addresses, Time to Live
+(TTL), and quality-of-service parameters, before routing it to the
+destination.</p>
+<h2 id="addressing-and-demultiplexing">Addressing and
+Demultiplexing</h2>
+<p>Communication requires coordination between the addressing schemes of
+both layers:</p>
+<ul>
+<li><strong>Host-to-Host vs. Process-to-Process:</strong> The Network
+layer uses IP addresses to route packets from a source host to a
+destination host. Once the packet arrives at the destination, the
+Network layer strips the IP header and passes the datagram up to UDP.
+UDP uses port numbers to direct the data to the specific application or
+process listening on that port.</li>
+<li><strong>Protocol Field Identification:</strong> The Network layer IP
+header contains a specific "Protocol" field (IPv4) or "Next Header"
+field (IPv6). For UDP, this field is set to the value <code>17</code>.
+This identifier tells the receiving Network layer exactly which
+transport protocol must handle the incoming payload.</li>
+</ul>
+<h2 id="shared-connectionless-model">Shared Connectionless Model</h2>
+<p>UDP and IP share an architectural design centered on "best-effort"
+delivery. The Network layer does not establish a circuit or guarantee
+packet delivery, ordering, or duplicate protection. UDP inherits this
+connectionless model directly:</p>
+<ul>
+<li><strong>No Handshakes:</strong> Neither layer performs a handshake
+before sending data.</li>
+<li><strong>Zero State Maintenance:</strong> Neither layer tracks
+sequence numbers, acknowledgments, or active connection states,
+minimizing memory and processing overhead.</li>
+<li><strong>Error Propagation:</strong> If the Network layer fails to
+deliver a packet due to network congestion or route failure, UDP does
+not attempt retransmissions.</li>
+</ul>
+<h2 id="handling-mtu-and-packet-fragmentation">Handling MTU and Packet
+Fragmentation</h2>
+<p>The Network layer defines a Maximum Transmission Unit (MTU), which is
+the largest packet size a physical network interface can transmit
+without breaking it apart.</p>
+<p>While UDP allows datagrams up to 65,535 bytes, sending payloads
+larger than the path MTU forces the Network layer to perform IP
+fragmentation. In IPv4, routers or the sending host split the IP packet
+containing the UDP datagram into smaller fragments. The receiving host's
+Network layer reassembles these fragments before delivering the complete
+UDP datagram to the transport layer. In IPv6, fragmentation is handled
+exclusively by the sending host.</p>
+<h2 id="the-ip-pseudo-header-and-error-checking">The IP Pseudo-Header
+and Error Checking</h2>
+<p>UDP calculates an optional (IPv4) or mandatory (IPv6) checksum to
+detect data corruption. To verify that a packet reached the correct
+destination, UDP calculates its checksum over not only the UDP header
+and payload but also a temporary structure called the "IP
+pseudo-header."</p>
+<p>This pseudo-header extracts critical fields directly from the Network
+layer, including the source IP address, destination IP address, and
+protocol number (<code>17</code>). This mechanism allows UDP to verify
+that the underlying Network layer did not misroute the datagram due to
+memory corruption or header errors.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

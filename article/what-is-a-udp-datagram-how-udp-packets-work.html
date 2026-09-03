@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is a UDP Datagram? How UDP Packets Work - udp</title>
+    <meta name="description" content="A User Datagram Protocol (UDP) datagram is a lightweight, connectionless data packet used to transmit information across IP networks at the Transport Layer. This article explains the core definition of a UDP datagram, details its compact 8-byte header st">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/what-is-a-udp-datagram-how-udp-packets-work">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is a UDP Datagram? How UDP Packets Work - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/what-is-a-udp-datagram-how-udp-packets-work" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="A User Datagram Protocol (UDP) datagram is a lightweight, connectionless data packet used to transmit information across IP networks at the Transport Layer. This article explains the core definition of a UDP datagram, details its compact 8-byte header st" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-a-udp-datagram-how-udp-packets-work">What Is a UDP
+Datagram? How UDP Packets Work</h1>
+<p>A User Datagram Protocol (UDP) datagram is a lightweight,
+connectionless data packet used to transmit information across IP
+networks at the Transport Layer. This article explains the core
+definition of a UDP datagram, details its compact 8-byte header
+structure, highlights its key operational characteristics, and explores
+the real-world applications where its speed and low latency are
+prioritized over guaranteed delivery.</p>
+<h2 id="understanding-the-udp-datagram">Understanding the UDP
+Datagram</h2>
+<p>In computer networking, a datagram is an independent, self-contained
+entity of data carrying sufficient information to be routed from the
+source to the destination computer without reliance on earlier
+exchanges. When using UDP (User Datagram Protocol), data is packaged
+into these units and transmitted across an Internet Protocol (IP)
+network.</p>
+<p>Unlike TCP (Transmission Control Protocol), UDP is connectionless. A
+UDP datagram is sent without establishing a prior connection via a
+handshake, and it does not require an acknowledgment from the receiving
+end to confirm receipt.</p>
+<h2 id="structure-of-a-udp-datagram">Structure of a UDP Datagram</h2>
+<p>A UDP datagram consists of two primary components: the
+<strong>Header</strong> and the <strong>Data (Payload)</strong>.</p>
+<p>The UDP header is fixed at just 8 bytes (64 bits) in size, split into
+four distinct 2-byte (16-bit) fields:</p>
+<ol type="1">
+<li><strong>Source Port (16 bits):</strong> Identifies the sending
+application's port number. This field is optional; if not used, it is
+set to zero.</li>
+<li><strong>Destination Port (16 bits):</strong> Identifies the
+receiving application's port number on the destination device. This
+field is mandatory so the receiving system knows which process should
+handle the data.</li>
+<li><strong>Length (16 bits):</strong> Specifies the total length of the
+UDP datagram in bytes, including both the 8-byte header and the payload.
+The minimum value is 8 (a header with no data).</li>
+<li><strong>Checksum (16 bits):</strong> Provides error-checking for the
+header and payload to detect corrupted data during transit. In IPv4,
+this field is optional, but in IPv6, it is mandatory.</li>
+</ol>
+<p>Following the header is the <strong>Data Payload</strong>, which
+contains the actual application data being transmitted.</p>
+<h2 id="key-characteristics-of-udp-datagrams">Key Characteristics of UDP
+Datagrams</h2>
+<ul>
+<li><strong>Low Overhead:</strong> With a fixed 8-byte header (compared
+to TCP's 20-to-60-byte header), UDP conserves network bandwidth and
+reduces processing overhead.</li>
+<li><strong>No Connection Establishment:</strong> Datagrams are
+transmitted immediately without waiting for a three-way handshake,
+reducing transmission latency.</li>
+<li><strong>Unreliable (Best-Effort Delivery):</strong> UDP does not
+guarantee that datagrams will reach their destination, nor does it
+automatically retransmit lost packets.</li>
+<li><strong>No Guaranteed Ordering:</strong> Datagrams can arrive out of
+order because each packet is routed independently across the
+network.</li>
+<li><strong>Preservation of Message Boundaries:</strong> UDP sends
+distinct datagrams. When a sender writes a datagram to a socket, the
+receiver reads that exact datagram in a single operation, preserving
+message boundaries unlike TCP's continuous byte stream.</li>
+</ul>
+<h2 id="common-use-cases">Common Use Cases</h2>
+<p>Because UDP datagrams minimize latency at the expense of guaranteed
+reliability, they are widely used in time-sensitive applications:</p>
+<ul>
+<li><strong>Live Streaming and VoIP:</strong> Voice and video
+applications (such as Zoom or live broadcasts) favor speed; dropping an
+occasional datagram is preferable to waiting for retransmissions.</li>
+<li><strong>Online Multiplayer Gaming:</strong> Fast state updates and
+player coordinates require real-time transmission without buffering
+delays.</li>
+<li><strong>DNS (Domain Name System):</strong> DNS queries are typically
+small and fit within a single datagram, allowing for rapid lookups.</li>
+<li><strong>Network Services:</strong> Protocols like DHCP (Dynamic Host
+Configuration Protocol), NTP (Network Time Protocol), and SNMP (Simple
+Network Management Protocol) utilize UDP for simple, efficient
+query-response mechanisms.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero-Copy Networking in UDP Socket Programming - udp</title>
+    <meta name="description" content="Zero-copy networking is a performance optimization technique that minimizes CPU overhead and memory bandwidth saturation by eliminating redundant data copying between user space and kernel space during network I/O. In standard UDP socket programming, tra">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/zero-copy-networking-in-udp-socket-programming">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Zero-Copy Networking in UDP Socket Programming - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/zero-copy-networking-in-udp-socket-programming" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Zero-copy networking is a performance optimization technique that minimizes CPU overhead and memory bandwidth saturation by eliminating redundant data copying between user space and kernel space during network I/O. In standard UDP socket programming, tra" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="zero-copy-networking-in-udp-socket-programming">Zero-Copy
+Networking in UDP Socket Programming</h1>
+<p>Zero-copy networking is a performance optimization technique that
+minimizes CPU overhead and memory bandwidth saturation by eliminating
+redundant data copying between user space and kernel space during
+network I/O. In standard UDP socket programming, transmitting and
+receiving datagrams requires multiple memory copies and context
+switches, which often becomes a bottleneck for high-throughput,
+latency-sensitive applications like video streaming, financial data
+feeds, and telemetry processing. This article explains how zero-copy
+applies to UDP, the specific kernel features used to implement it, and
+the trade-offs involved in bypassing traditional memory duplication.</p>
+<h2 id="the-standard-udp-data-path-vs-zero-copy">The Standard UDP Data
+Path vs. Zero-Copy</h2>
+<p>In a traditional UDP transmission pipeline, data moves through
+several stages:</p>
+<ol type="1">
+<li><strong>User Space to Kernel Space (TX):</strong> The application
+allocates a buffer and calls <code>sendto()</code> or
+<code>sendmsg()</code>. The operating system copies this buffer into a
+kernel-allocated socket buffer (<code>sk_buff</code> in Linux).</li>
+<li><strong>Kernel Space to NIC (TX):</strong> The network interface
+card (NIC) reads the data from kernel memory via Direct Memory Access
+(DMA) and puts it on the wire.</li>
+<li><strong>Receiving (RX):</strong> The reverse occurs on the receiving
+end. The NIC DMAs the incoming packet into a kernel buffer, and the
+kernel copies the payload into the user-space buffer provided during
+<code>recvfrom()</code> or <code>recvmsg()</code>.</li>
+</ol>
+<p>This copying process consumes CPU cycles, pollutes CPU caches
+(L1/L2/L3), and increases latency.</p>
+<p>Zero-copy networking eliminates the intermediate kernel copy. The
+network hardware reads directly from or writes directly into user-space
+memory, significantly reducing CPU utilization and maximizing network
+throughput.</p>
+<h2 id="implementing-zero-copy-for-udp-transmission-tx">Implementing
+Zero-Copy for UDP Transmission (TX)</h2>
+<p>On modern Linux kernels (version 4.14 and later), zero-copy is
+supported for UDP through the <code>MSG_ZEROCOPY</code> flag passed to
+<code>sendmsg()</code>.</p>
+<h3 id="how-msg_zerocopy-works">How <code>MSG_ZEROCOPY</code> Works</h3>
+<ol type="1">
+<li><strong>Socket Configuration:</strong> The application enables
+zero-copy on the socket using <code>setsockopt</code> with the
+<code>SO_ZEROCOPY</code> option.</li>
+<li><strong>Direct DMA Mapping:</strong> When the application calls
+<code>sendmsg()</code> with the <code>MSG_ZEROCOPY</code> flag, the
+kernel does not copy the user-space buffer. Instead, it pins the virtual
+memory pages of the buffer and passes their physical addresses directly
+to the NIC's DMA engine.</li>
+<li><strong>Completion Notification:</strong> Because the NIC reads
+directly from user memory, the application must not modify or free the
+buffer while transmission is in progress. The kernel informs the
+application that transmission is complete by placing a notification on
+the socket's error queue (<code>MSG_ERRQUEUE</code>). The application
+monitors this queue using <code>poll()</code> or <code>epoll()</code> to
+know when the buffer can be safely reused.</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Enabling zero-copy on a UDP socket</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> one <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>setsockopt<span class="op">(</span>sockfd<span class="op">,</span> SOL_SOCKET<span class="op">,</span> SO_ZEROCOPY<span class="op">,</span> <span class="op">&amp;</span>one<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>one<span class="op">));</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">// Sending data with MSG_ZEROCOPY</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>sendmsg<span class="op">(</span>sockfd<span class="op">,</span> <span class="op">&amp;</span>msg<span class="op">,</span> MSG_ZEROCOPY<span class="op">);</span></span></code></pre></div>
+<h2 id="implementing-zero-copy-for-udp-reception-rx">Implementing
+Zero-Copy for UDP Reception (RX)</h2>
+<p>Zero-copy on the receive path is inherently more complex for standard
+UDP sockets. When a packet arrives, the kernel must inspect headers to
+determine which socket owns the payload before it knows where to place
+the data. Several approaches are used to overcome this:</p>
+<h3 id="1-af_xdp-xdp-sockets">1. <code>AF_XDP</code> (XDP Sockets)</h3>
+<p>eXpress Data Path (XDP) coupled with <code>AF_XDP</code> sockets
+provides a high-performance zero-copy path for UDP packets. It allows an
+application to allocate a designated memory area (UMEM) shared directly
+between the user space and the NIC driver. Incoming UDP packets are
+directed into user-space memory frames immediately after arriving at the
+network driver, bypassing the standard kernel network stack
+entirely.</p>
+<h3 id="2-memory-mapped-sockets-packet_mmap">2. Memory-Mapped Sockets
+(<code>PACKET_MMAP</code>)</h3>
+<p>Using <code>AF_PACKET</code> sockets with ring buffers
+(<code>PACKET_RX_RING</code>) creates a shared circular buffer between
+the kernel and user space. While commonly used for raw packet capturing,
+it avoids standard <code>recv()</code> copy overhead for custom UDP
+parsers.</p>
+<h2 id="batching-and-auxiliary-optimizations">Batching and Auxiliary
+Optimizations</h2>
+<p>Zero-copy is often paired with I/O batching mechanisms to further
+reduce context-switch overhead:</p>
+<ul>
+<li><strong><code>sendmmsg()</code> and
+<code>recvmmsg()</code>:</strong> Allow sending and receiving multiple
+UDP datagrams in a single system call.</li>
+<li><strong>UDP Segment Offload (USO):</strong> Allows the application
+to pass a large buffer (up to 64KB) to the kernel in a single write
+operation, which the network card hardware then segments into individual
+UDP datagrams matching the Path MTU (Maximum Transmission Unit).</li>
+</ul>
+<h2 id="practical-trade-offs-and-considerations">Practical Trade-offs
+and Considerations</h2>
+<p>While zero-copy reduces CPU utilization, it is not always faster for
+every workload:</p>
+<ul>
+<li><strong>Payload Size:</strong> Page pinning and completion
+notification processing introduce fixed overhead. For small UDP packets
+(e.g., less than 2 to 4 KB), standard copying is often faster. Zero-copy
+is most effective for larger payloads or batched streams.</li>
+<li><strong>Buffer Management Complexity:</strong> Applications must
+manage asynchronous buffer lifecycles, ensuring memory is neither
+overwritten nor freed until the kernel's completion notification is
+received via the error queue.</li>
+<li><strong>Page Alignment:</strong> Buffers should generally be
+page-aligned to minimize overhead during memory pinning.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

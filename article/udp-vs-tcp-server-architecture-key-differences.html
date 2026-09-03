@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDP vs TCP Server Architecture: Key Differences - udp</title>
+    <meta name="description" content="This article explores the fundamental architectural differences between UDP (User Datagram Protocol) and TCP (Transmission Control Protocol) servers. It examines how connection management, state tracking, resource allocation, concurrency models, and reli">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/udp-vs-tcp-server-architecture-key-differences">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="UDP vs TCP Server Architecture: Key Differences - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/udp-vs-tcp-server-architecture-key-differences" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explores the fundamental architectural differences between UDP (User Datagram Protocol) and TCP (Transmission Control Protocol) servers. It examines how connection management, state tracking, resource allocation, concurrency models, and reli" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="udp-vs-tcp-server-architecture-key-differences">UDP vs TCP
+Server Architecture: Key Differences</h1>
+<p>This article explores the fundamental architectural differences
+between UDP (User Datagram Protocol) and TCP (Transmission Control
+Protocol) servers. It examines how connection management, state
+tracking, resource allocation, concurrency models, and reliability
+mechanisms dictate the distinct ways these two server types process
+network traffic.</p>
+<h2 id="connection-management-and-socket-handling">Connection Management
+and Socket Handling</h2>
+<p>The most fundamental architectural difference lies in how sockets and
+connections are managed:</p>
+<ul>
+<li><strong>TCP Server Architecture:</strong> A TCP server is
+connection-oriented. It operates using a listening socket to accept
+incoming connection requests via a three-way handshake
+(<code>SYN</code>, <code>SYN-ACK</code>, <code>ACK</code>). Once
+accepted, the operating system creates a new, dedicated connected socket
+for each client. The server communicates with clients through these
+distinct file descriptors, isolating client streams from one
+another.</li>
+<li><strong>UDP Server Architecture:</strong> A UDP server is
+connectionless. It binds to a single port and listens for incoming
+datagrams without performing any handshake. The server typically uses a
+single socket to process messages from multiple clients using functions
+like <code>recvfrom()</code> and <code>sendto()</code>, reading the
+sender's IP and port directly from each individual packet.</li>
+</ul>
+<h2 id="state-management-and-resource-overhead">State Management and
+Resource Overhead</h2>
+<p>Resource allocation in server memory varies greatly based on the
+protocol's state requirements:</p>
+<ul>
+<li><strong>TCP State Overhead:</strong> TCP servers must maintain
+extensive state information for every active connection. This includes
+sequence numbers, acknowledgment numbers, congestion control windows,
+retransmission timers, and receive/send buffers. As the number of
+concurrent connections grows, memory consumption and context switching
+overhead increase significantly.</li>
+<li><strong>UDP Stateless Design:</strong> UDP servers are inherently
+stateless at the transport layer. The server does not maintain
+connection status, timers, or window sizes unless implemented at the
+application layer. This allows a UDP server to maintain a minimal memory
+footprint, making it lightweight and resilient against
+resource-exhaustion attacks like SYN floods.</li>
+</ul>
+<h2 id="data-transmission-and-reliability-mechanisms">Data Transmission
+and Reliability Mechanisms</h2>
+<p>The underlying transport layer protocols enforce different
+responsibilities on the server software:</p>
+<ul>
+<li><strong>TCP Servers:</strong> Reliability, packet ordering,
+duplicate detection, and flow control are handled directly by the
+operating system kernel. A TCP server receives data as a continuous,
+ordered byte stream. However, the server must handle stream framing, as
+TCP does not preserve message boundaries.</li>
+<li><strong>UDP Servers:</strong> Delivery is "best-effort." Packets can
+arrive out of order, duplicated, or not at all. UDP preserves message
+boundaries (each read operation corresponds to exactly one write
+operation by the client), but if reliability, ordering, or congestion
+control is required, the server application must explicitly implement
+these mechanisms.</li>
+</ul>
+<h2 id="concurrency-and-scaling-models">Concurrency and Scaling
+Models</h2>
+<p>The architectures utilize different strategies to handle high
+throughput and concurrent clients:</p>
+<ul>
+<li><strong>TCP Concurrency:</strong> TCP servers commonly rely on
+multi-threading, worker processes, or non-blocking event loops using I/O
+multiplexing mechanisms (such as <code>epoll</code>,
+<code>kqueue</code>, or <code>IOCP</code>) to monitor thousands of
+distinct socket file descriptors simultaneously.</li>
+<li><strong>UDP Concurrency:</strong> Since all traffic typically flows
+through a single socket, a UDP server often scales by reading packets
+from the main socket and distributing them to a thread pool or worker
+queues for processing. Modern operating systems also support options
+like <code>SO_REUSEPORT</code>, which allows multiple server processes
+to bind to the same UDP port and let the kernel load-balance incoming
+datagrams across them.</li>
+</ul>
+<h2 id="summary-of-architectural-differences">Summary of Architectural
+Differences</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">TCP Server</th>
+<th style="text-align: left;">UDP Server</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Connection Type</strong></td>
+<td style="text-align: left;">Connection-oriented (Handshake
+required)</td>
+<td style="text-align: left;">Connectionless (No handshake)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Socket Model</strong></td>
+<td style="text-align: left;">One listening socket + dedicated sockets
+per client</td>
+<td style="text-align: left;">Single socket for multiple clients</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>State Tracking</strong></td>
+<td style="text-align: left;">Managed by kernel per connection</td>
+<td style="text-align: left;">None at transport layer</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Data Format</strong></td>
+<td style="text-align: left;">Continuous byte stream</td>
+<td style="text-align: left;">Discrete datagrams</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Memory Footprint</strong></td>
+<td style="text-align: left;">Higher (Buffers, states, descriptors)</td>
+<td style="text-align: left;">Lower (Minimal per-packet overhead)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Primary Use Cases</strong></td>
+<td style="text-align: left;">Web (HTTP/HTTPS), File Transfer,
+Databases</td>
+<td style="text-align: left;">Real-time gaming, VoIP, DNS, Video
+streaming</td>
+</tr>
+</tbody>
+</table></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

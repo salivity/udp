@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How WireGuard Uses UDP for Better VPN Performance - udp</title>
+    <meta name="description" content="WireGuard relies exclusively on the User Datagram Protocol (UDP) to achieve industry-leading speeds, minimal latency, and resilient network switching. By operating strictly over UDP rather than the Transmission Control Protocol (TCP), WireGuard avoids co">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-wireguard-uses-udp-for-better-vpn-performance">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How WireGuard Uses UDP for Better VPN Performance - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-wireguard-uses-udp-for-better-vpn-performance" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="WireGuard relies exclusively on the User Datagram Protocol (UDP) to achieve industry-leading speeds, minimal latency, and resilient network switching. By operating strictly over UDP rather than the Transmission Control Protocol (TCP), WireGuard avoids co" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-wireguard-uses-udp-for-better-vpn-performance">How WireGuard
+Uses UDP for Better VPN Performance</h1>
+<p>WireGuard relies exclusively on the User Datagram Protocol (UDP) to
+achieve industry-leading speeds, minimal latency, and resilient network
+switching. By operating strictly over UDP rather than the Transmission
+Control Protocol (TCP), WireGuard avoids common networking bottlenecks
+like TCP meltdown, reduces packet overhead, and enables instant
+connection roaming across changing networks.</p>
+<h3 id="eliminating-the-tcp-over-tcp-meltdown">Eliminating the
+TCP-over-TCP Meltdown</h3>
+<p>Most internet traffic already uses TCP, which manages its own
+error-checking, packet ordering, and retransmission mechanisms. When a
+VPN encapsulates TCP traffic inside an outer TCP tunnel, packet loss
+triggers retransmissions on both the inner and outer layers
+simultaneously. This redundancy causes extreme latency spikes and
+bandwidth collapse, known as the "TCP-over-TCP meltdown."</p>
+<p>WireGuard prevents this issue by using UDP as its outer transport
+layer. Because UDP does not enforce its own delivery guarantees or
+retransmissions, it allows the underlying traffic's native transport
+layer to handle error correction independently, keeping data moving
+efficiently without compounding delays.</p>
+<h3 id="reducing-header-overhead-and-latency">Reducing Header Overhead
+and Latency</h3>
+<p>UDP is a connectionless protocol featuring a fixed, lightweight
+header of just 8 bytes, compared to TCP's minimum header size of 20
+bytes. By stripping away complex sequencing and flow-control fields from
+the transport layer, WireGuard reduces overall packet size (MTU bloat)
+and CPU processing requirements.</p>
+<p>This minimal overhead allows routers and network interfaces to
+process and route encapsulated packets faster, maximizing throughput
+even on low-powered devices.</p>
+<h3 id="instant-connection-handshakes">Instant Connection
+Handshakes</h3>
+<p>Unlike traditional protocols that require multi-step negotiations
+before data can transfer, WireGuard uses a streamlined 1-round-trip
+(1-RTT) handshake over UDP based on the Noise protocol framework.</p>
+<p>Because UDP does not require a preliminary three-way handshake (SYN,
+SYN-ACK, ACK), WireGuard can initiate secure communication almost
+instantaneously. If the connection is idle, it goes completely silent,
+sending no keepalive packets unless necessary, which conserves bandwidth
+and device battery life.</p>
+<h3 id="seamless-roaming-and-endpoint-mobility">Seamless Roaming and
+Endpoint Mobility</h3>
+<p>TCP connections are tightly bound to specific source and destination
+IP addresses and ports; if a device switches from Wi-Fi to cellular
+data, a TCP-based VPN tunnel breaks and must re-establish from
+scratch.</p>
+<p>WireGuard leverages UDP's connectionless design paired with
+"cryptokey routing." Instead of tracking connections by IP address,
+WireGuard identifies peers purely by their public cryptographic keys.
+When an authenticated client sends a UDP packet from a new IP address,
+the WireGuard server simply updates the endpoint address on the fly. The
+user experiences uninterrupted connectivity with zero re-authentication
+downtime.</p>
+<h3 id="stealth-and-resistance-to-scans">Stealth and Resistance to
+Scans</h3>
+<p>Operating over UDP enables WireGuard to remain completely silent
+until a cryptographically valid packet is received. WireGuard endpoints
+do not respond to unauthenticated packets or port scans, making the VPN
+service invisible to unauthorized network probes while keeping server
+resources free from handling unauthorized connection attempts.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

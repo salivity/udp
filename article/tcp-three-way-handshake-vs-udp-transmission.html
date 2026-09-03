@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCP Three-Way Handshake vs UDP Transmission - udp</title>
+    <meta name="description" content="Transmission Control Protocol (TCP) and User Datagram Protocol (UDP) manage data initiation through fundamentally different paradigms. TCP utilizes a connection-oriented approach that relies on a three-way handshake (SYN, SYN-ACK, ACK) to establish a syn">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/tcp-three-way-handshake-vs-udp-transmission">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="TCP Three-Way Handshake vs UDP Transmission - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/tcp-three-way-handshake-vs-udp-transmission" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Transmission Control Protocol (TCP) and User Datagram Protocol (UDP) manage data initiation through fundamentally different paradigms. TCP utilizes a connection-oriented approach that relies on a three-way handshake (SYN, SYN-ACK, ACK) to establish a syn" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="tcp-three-way-handshake-vs-udp-transmission">TCP Three-Way
+Handshake vs UDP Transmission</h1>
+<p>Transmission Control Protocol (TCP) and User Datagram Protocol (UDP)
+manage data initiation through fundamentally different paradigms. TCP
+utilizes a connection-oriented approach that relies on a three-way
+handshake (SYN, SYN-ACK, ACK) to establish a synchronized, reliable
+channel before any application data is sent. In contrast, UDP operates
+on a connectionless, "fire-and-forget" model where data transmission
+begins immediately without prior negotiation, state verification, or
+confirmation of receiver readiness.</p>
+<h2 id="tcps-three-way-handshake-mechanism">TCP's Three-Way Handshake
+Mechanism</h2>
+<p>TCP requires mutual agreement between the client and server before
+data transfer begins. This initiation process ensures reliability, data
+integrity, and sequence tracking through three distinct steps:</p>
+<ol type="1">
+<li><strong>SYN (Synchronize):</strong> The client generates an initial
+sequence number (ISN) and sends a segment with the SYN flag set to the
+server, requesting to open a connection.</li>
+<li><strong>SYN-ACK (Synchronize-Acknowledge):</strong> Upon receiving
+the request, the server allocates resources, creates its own ISN, and
+responds with a segment that sets both the SYN and ACK flags. The ACK
+confirms receipt of the client's SYN (ISN + 1).</li>
+<li><strong>ACK (Acknowledge):</strong> The client sends a final segment
+with the ACK flag set back to the server (acknowledging the server's ISN
++ 1). Once the server receives this packet, the TCP connection is
+officially established, and data transfer can commence.</li>
+</ol>
+<p>This process introduces a delay of roughly one and a half round-trip
+times (1.5 RTT) before payload delivery, but it guarantees that both
+endpoints are reachable, receptive, and synchronized.</p>
+<h2 id="udps-data-transmission-initiation">UDP's Data Transmission
+Initiation</h2>
+<p>UDP bypasses connection establishment entirely. When an application
+initiates data transfer using UDP:</p>
+<ul>
+<li><strong>Zero Handshake Delay (0-RTT):</strong> The sending
+application packages data directly into UDP datagrams, attaches the
+destination IP address and port number, and immediately dispatches them
+onto the network.</li>
+<li><strong>No State Tracking:</strong> Neither the sender nor the
+receiver maintains a connection state, sequence numbers, or transmission
+buffers dedicated to a specific session.</li>
+<li><strong>No Readiness Check:</strong> The sender transmits data
+without verifying whether the receiving application is active,
+reachable, or capable of processing incoming packets.</li>
+</ul>
+<h2 id="key-contrasts">Key Contrasts</h2>
+<ul>
+<li><strong>Latency and Overhead:</strong> TCP’s handshake introduces
+connection setup overhead and latency, whereas UDP provides zero-latency
+initiation, transmitting the payload on the very first packet.</li>
+<li><strong>Reliability and Verification:</strong> TCP confirms that the
+remote host is active and ready to receive before delivering payloads;
+UDP offers no delivery guarantees or initial reachability checks.</li>
+<li><strong>Resource Allocation:</strong> TCP allocates socket buffers
+and state variables prior to data flow; UDP remains stateless, consuming
+fewer resources on both endpoints.</li>
+<li><strong>Use Cases:</strong> TCP’s structured initiation suits
+applications where complete data integrity is mandatory, such as web
+browsing (HTTP/HTTPS), email (SMTP/IMAP), and file transfers (FTP).
+UDP’s immediate transmission model is optimized for real-time
+applications that favor speed over packet recovery, such as live
+streaming, online gaming, VoIP, and DNS queries.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is SCTP and How Does It Compare to UDP? - udp</title>
+    <meta name="description" content="Stream Control Transmission Protocol (SCTP) is a reliable, message-oriented transport layer protocol that combines key characteristics of both TCP and UDP while introducing advanced features such as multi-streaming and multi-homing. This article explains">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/what-is-sctp-and-how-does-it-compare-to-udp">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What is SCTP and How Does It Compare to UDP? - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/what-is-sctp-and-how-does-it-compare-to-udp" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Stream Control Transmission Protocol (SCTP) is a reliable, message-oriented transport layer protocol that combines key characteristics of both TCP and UDP while introducing advanced features such as multi-streaming and multi-homing. This article explains" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="what-is-sctp-and-how-does-it-compare-to-udp">What is SCTP and
+How Does It Compare to UDP?</h1>
+<p>Stream Control Transmission Protocol (SCTP) is a reliable,
+message-oriented transport layer protocol that combines key
+characteristics of both TCP and UDP while introducing advanced features
+such as multi-streaming and multi-homing. This article explains the
+fundamentals of SCTP, highlights its core capabilities, and provides a
+direct comparison between SCTP and the User Datagram Protocol (UDP) to
+help determine the right protocol for specific networking needs.</p>
+<h2 id="what-is-sctp">What is SCTP?</h2>
+<p>SCTP (defined in RFC 4960) operates at the transport layer of the OSI
+model. Like TCP, it provides reliable, connection-oriented data transfer
+with congestion control. Like UDP, it transmits data in discrete
+messages (framing) rather than an unstructured stream of bytes.</p>
+<p>SCTP introduces two major capabilities:</p>
+<ul>
+<li><strong>Multi-Streaming:</strong> SCTP can split data into multiple
+independent streams within a single association (connection). If a
+packet in one stream is lost, only that specific stream pauses for
+retransmission, preventing Head-of-Line (HoL) blocking for the other
+streams.</li>
+<li><strong>Multi-Homing:</strong> An SCTP endpoint can bind to multiple
+IP addresses. If a network interface or path fails, traffic
+automatically fails over to an alternate IP address without terminating
+the session.</li>
+</ul>
+<h2 id="core-differences-sctp-vs-udp">Core Differences: SCTP vs.
+UDP</h2>
+<p>While both protocols preserve message boundaries, they serve
+different networking requirements.</p>
+<h3 id="1-reliability-and-delivery">1. Reliability and Delivery</h3>
+<ul>
+<li><strong>UDP:</strong> Unreliable and "best-effort." UDP does not
+acknowledge packet delivery, retransmit lost data, or guarantee that
+messages arrive in order.</li>
+<li><strong>SCTP:</strong> Fully reliable by default. It uses
+acknowledgments, timeouts, and retransmissions to guarantee delivery.
+SCTP also supports Partial Reliability (PR-SCTP), allowing applications
+to set limits on retransmission attempts or packet lifetimes.</li>
+</ul>
+<h3 id="2-connection-state-and-handshake">2. Connection State and
+Handshake</h3>
+<ul>
+<li><strong>UDP:</strong> Connectionless. Packets are sent without
+establishing a prior session, resulting in zero setup latency.</li>
+<li><strong>SCTP:</strong> Connection-oriented. It establishes an
+"association" using a four-way handshake with a cookie mechanism
+designed to protect against SYN-flood denial-of-service attacks.</li>
+</ul>
+<h3 id="3-message-ordering">3. Message Ordering</h3>
+<ul>
+<li><strong>UDP:</strong> Does not track or enforce packet sequence.
+Packets may arrive out of order, and the receiving application must
+reorder them if necessary.</li>
+<li><strong>SCTP:</strong> Guarantees in-order delivery per stream.
+Applications can also mark specific messages for unordered delivery
+within a stream when sequential ordering is unnecessary.</li>
+</ul>
+<h3 id="4-congestion-and-flow-control">4. Congestion and Flow
+Control</h3>
+<ul>
+<li><strong>UDP:</strong> Does not implement built-in congestion or flow
+control. It sends data at the rate the application generates it, which
+can cause network congestion if unmanaged.</li>
+<li><strong>SCTP:</strong> Implements robust congestion control
+algorithms (similar to TCP) and receiver-window flow control to prevent
+network saturation.</li>
+</ul>
+<h3 id="5-header-overhead-and-complexity">5. Header Overhead and
+Complexity</h3>
+<ul>
+<li><strong>UDP:</strong> Lightweight with a fixed 8-byte header, making
+it simple to process and ideal for resource-constrained
+environments.</li>
+<li><strong>SCTP:</strong> Heavier overhead, featuring a 12-byte common
+header followed by variable-length chunks for control and data
+payloads.</li>
+</ul>
+<h2 id="summary-comparison">Summary Comparison</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">SCTP</th>
+<th style="text-align: left;">UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Connection Type</strong></td>
+<td style="text-align: left;">Connection-oriented (Association)</td>
+<td style="text-align: left;">Connectionless</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Reliability</strong></td>
+<td style="text-align: left;">Reliable (Configurable via PR-SCTP)</td>
+<td style="text-align: left;">Unreliable (Best-effort)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Transmission Unit</strong></td>
+<td style="text-align: left;">Message-based (Chunks)</td>
+<td style="text-align: left;">Message-based (Datagrams)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ordering</strong></td>
+<td style="text-align: left;">In-order (per stream) or unordered</td>
+<td style="text-align: left;">Unordered</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Head-of-Line
+Blocking</strong></td>
+<td style="text-align: left;">Minimized via multi-streaming</td>
+<td style="text-align: left;">None (No reliability mechanism)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Multi-Homing</strong></td>
+<td style="text-align: left;">Native support</td>
+<td style="text-align: left;">No native support</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Congestion Control</strong></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Header Size</strong></td>
+<td style="text-align: left;">12 bytes + Chunk headers</td>
+<td style="text-align: left;">8 bytes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="use-cases">Use Cases</h2>
+<ul>
+<li><strong>Choose UDP when:</strong> Minimal latency and low overhead
+are the primary concerns, and occasional packet loss is acceptable.
+Common applications include real-time gaming, live video/voice streaming
+(VoIP/RTP), and simple request-response queries like DNS.</li>
+<li><strong>Choose SCTP when:</strong> The application requires
+message-oriented framing combined with reliable delivery, fault
+tolerance, and independent data streams. Common applications include
+telecommunication signaling (SS7/SIGTRAN), WebRTC data channels, and
+mission-critical distributed systems.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

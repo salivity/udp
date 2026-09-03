@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIC 0-RTT Handshake Performance Benefits - udp</title>
+    <meta name="description" content="This article explores the performance advantages of QUIC’s Zero Round-Trip Time (0-RTT) handshake compared to conventional transport setups over UDP and traditional TCP/TLS connections. You will learn how 0-RTT eliminates latency for returning clients,">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/quic-0-rtt-handshake-performance-benefits">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="QUIC 0-RTT Handshake Performance Benefits - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/quic-0-rtt-handshake-performance-benefits" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explores the performance advantages of QUIC’s Zero Round-Trip Time (0-RTT) handshake compared to conventional transport setups over UDP and traditional TCP/TLS connections. You will learn how 0-RTT eliminates latency for returning clients," />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="quic-0-rtt-handshake-performance-benefits">QUIC 0-RTT Handshake
+Performance Benefits</h1>
+<p>This article explores the performance advantages of QUIC’s Zero
+Round-Trip Time (0-RTT) handshake compared to conventional transport
+setups over UDP and traditional TCP/TLS connections. You will learn how
+0-RTT eliminates latency for returning clients, accelerates data
+transfer, improves mobile user experience, and handles packet
+transmission efficiently without standard handshake overhead.</p>
+<h3 id="what-is-the-quic-0-rtt-handshake">What is the QUIC 0-RTT
+Handshake?</h3>
+<p>Standard UDP does not inherently provide connection states, security,
+or delivery guarantees. When applications build secure communication on
+top of UDP without QUIC, they typically layer TLS over it (such as
+DTLS), requiring multiple round trips back and forth between the client
+and server to establish cryptographic parameters before transmitting
+payload data.</p>
+<p>QUIC combines transport and cryptographic handshakes into a unified
+layer. With 0-RTT connection resumption, a client that has previously
+communicated with a server can send encrypted application data—such as
+an HTTP GET request—in the very first packet.</p>
+<h3 id="instantaneous-data-transmission">Instantaneous Data
+Transmission</h3>
+<p>The primary benefit of 0-RTT is the complete elimination of
+round-trip delays during reconnection:</p>
+<ul>
+<li><strong>Traditional TCP + TLS 1.3:</strong> Requires 1 to 2 round
+trips (1-RTT to 2-RTT) before any application data can be sent.</li>
+<li><strong>Standard UDP with Custom Handshakes:</strong> Often requires
+at least 1-RTT to verify client authenticity and negotiate encryption
+keys.</li>
+<li><strong>QUIC 0-RTT:</strong> Requires 0 round trips. The client
+encrypts the initial request using stored session tokens from the
+previous connection and transmits it immediately.</li>
+</ul>
+<p>For users on high-latency connections, such as cellular networks with
+round-trip times of 100ms or higher, 0-RTT cuts 100ms to 200ms off the
+initial request time instantly.</p>
+<h3 id="reduced-time-to-first-byte-ttfb">Reduced Time to First Byte
+(TTFB)</h3>
+<p>Because the client does not wait for a server acknowledgment before
+transmitting the payload, the Time to First Byte (TTFB) is drastically
+reduced. Web assets, API responses, and dynamic data begin processing on
+the server immediately upon receipt of the first network packet, leading
+to faster Largest Contentful Paint (LCP) scores and snappier page
+loads.</p>
+<h3 id="stream-multiplexing-without-handshake-delays">Stream
+Multiplexing Without Handshake Delays</h3>
+<p>Unlike standard UDP implementations that require application-level
+sequencing to manage multiple data streams, QUIC natively supports
+multiplexed streams. Combined with 0-RTT:</p>
+<ul>
+<li>Multiple independent requests can be initiated in the initial
+packet.</li>
+<li>Packet loss in one stream does not block data delivery in other
+streams, eliminating head-of-line blocking while maintaining zero-delay
+startup.</li>
+</ul>
+<h3 id="seamless-connection-migration">Seamless Connection
+Migration</h3>
+<p>Mobile devices frequently switch networks, such as moving from Wi-Fi
+to cellular data. Standard UDP implementations often drop application
+context or require the application to renegotiate endpoints. QUIC uses
+unique 64-bit Connection IDs rather than IP/port tuples. When combined
+with fast session resumption techniques like 0-RTT, network transitions
+occur with zero perceptible interruption to the data flow.</p>
+<h3 id="bandwidth-and-battery-efficiency">Bandwidth and Battery
+Efficiency</h3>
+<p>By removing the back-and-forth control packet exchanges required by
+traditional multi-step handshakes, 0-RTT reduces total radio uptime on
+mobile devices. Transmitting the connection parameters and data payload
+concurrently minimizes radio state transitions, preserving battery life
+and lowering overall bandwidth consumption on constrained networks.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

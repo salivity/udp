@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How RoCE Protocol Utilizes UDP - udp</title>
+    <meta name="description" content="This article provides an overview of how the Remote Direct Memory Access over Converged Ethernet (RoCE) protocol integrates the User Datagram Protocol (UDP) to achieve high-performance, low-latency networking across routed environments. It examines the a">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-roce-protocol-utilizes-udp">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How RoCE Protocol Utilizes UDP - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-roce-protocol-utilizes-udp" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article provides an overview of how the Remote Direct Memory Access over Converged Ethernet (RoCE) protocol integrates the User Datagram Protocol (UDP) to achieve high-performance, low-latency networking across routed environments. It examines the a" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-roce-protocol-utilizes-udp">How RoCE Protocol Utilizes
+UDP</h1>
+<p>This article provides an overview of how the Remote Direct Memory
+Access over Converged Ethernet (RoCE) protocol integrates the User
+Datagram Protocol (UDP) to achieve high-performance, low-latency
+networking across routed environments. It examines the architectural
+shift from Layer 2 RoCEv1 to Layer 3 RoCEv2, the structure of UDP packet
+encapsulation, the critical function of UDP ports for traffic routing,
+and the implementation of Equal-Cost Multi-Path (ECMP) load
+balancing.</p>
+<h3 id="the-evolution-from-rocev1-to-rocev2">The Evolution from RoCEv1
+to RoCEv2</h3>
+<p>The initial version of the protocol, RoCEv1, operated strictly at the
+Data Link layer (Layer 2) of the OSI model. It encapsulated InfiniBand
+transport headers directly inside standard Ethernet frames using a
+dedicated EtherType (0x8915). Because it lacked network-layer
+addressing, RoCEv1 was non-routable and confined strictly to single
+Layer 2 broadcast domains.</p>
+<p>To overcome this limitation, the InfiniBand Trade Association (IBTA)
+introduced RoCEv2, also known as Routable RoCE (RRoCE). RoCEv2 replaces
+the direct Ethernet encapsulation by inserting standard IPv4 or IPv6
+headers alongside a UDP transport header between the network layer and
+the InfiniBand payload.</p>
+<h3 id="udp-packet-encapsulation-structure">UDP Packet Encapsulation
+Structure</h3>
+<p>In a RoCEv2 implementation, memory transfer operations bypass the
+host CPU and standard operating system network stacks. The RDMA-capable
+Network Interface Card (rNIC) generates the packet headers directly in
+hardware.</p>
+<p>The resulting packet structure contains:</p>
+<ol type="1">
+<li><strong>Ethernet Header:</strong> Standard Layer 2 addressing (MAC
+addresses).</li>
+<li><strong>IP Header:</strong> IPv4 or IPv6 addressing for Layer 3
+inter-subnet routing.</li>
+<li><strong>UDP Header:</strong> The 8-byte transport header containing
+source and destination ports, length, and checksum fields.</li>
+<li><strong>InfiniBand Base Transport Header (BTH):</strong> Contains
+RDMA-specific control fields, such as the partition key, operation code,
+and destination Queue Pair (QP).</li>
+<li><strong>RDMA Payload:</strong> The actual application data being
+transferred.</li>
+<li><strong>Invariant CRC (ICRC) and Frame Check Sequence
+(FCS):</strong> Integrity verification fields.</li>
+</ol>
+<h3 id="the-role-of-udp-port-numbers">The Role of UDP Port Numbers</h3>
+<p>RoCEv2 relies on UDP headers to interface seamlessly with standard
+data center switching hardware:</p>
+<ul>
+<li><strong>Destination Port (Port 4791):</strong> The Internet Assigned
+Numbers Authority (IANA) designated UDP port 4791 specifically for
+RoCEv2 traffic. When receiving hardware (such as a top-of-rack switch or
+target rNIC) inspects the packet, port 4791 indicates that the UDP
+payload contains InfiniBand transport architecture data rather than
+standard socket payload.</li>
+<li><strong>Source Port Calculation for ECMP:</strong> Modern data
+center networks utilize Equal-Cost Multi-Path (ECMP) routing to
+distribute traffic across parallel network links. Standard network
+switches parse the IP 5-tuple (Source IP, Destination IP, Protocol,
+Source Port, Destination Port) to calculate hashing buckets for link
+assignment. To avoid traffic bottlenecks caused by using a static port,
+the sending rNIC dynamically generates the UDP source port by hashing
+connection-specific metadata, such as the Queue Pair Number (QPN). This
+ensures distinct RDMA flows are distributed evenly across all available
+network paths without requiring deep packet inspection of the InfiniBand
+payload.</li>
+</ul>
+<h3 id="udp-checksum-handling">UDP Checksum Handling</h3>
+<p>In traditional networking, UDP includes an optional 16-bit checksum
+to detect data corruption across the IP and UDP headers and payload. In
+RoCEv2 deployments, calculating and validating standard UDP checksums
+can introduce unnecessary processing overhead.</p>
+<p>Because RoCEv2 includes its own Invariant Cyclic Redundancy Check
+(ICRC) to protect the RDMA payload and headers across the entire path,
+the UDP checksum field is frequently set to <code>0x0000</code>
+(disabled) in IPv4 configurations. If IPv6 is used, where a UDP checksum
+is traditionally mandatory, specialized network hardware either offloads
+the computation to silicon or complies with RFC standards that permit
+zero-checksum modes for encapsulated tunnels.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

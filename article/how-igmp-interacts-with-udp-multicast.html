@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How IGMP Interacts with UDP Multicast - udp</title>
+    <meta name="description" content="The Internet Group Management Protocol (IGMP) and User Datagram Protocol (UDP) multicast work together to enable efficient one-to-many data streaming over IPv4 networks. While UDP delivers the actual payload without the overhead of connection management,">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-igmp-interacts-with-udp-multicast">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How IGMP Interacts with UDP Multicast - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-igmp-interacts-with-udp-multicast" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The Internet Group Management Protocol (IGMP) and User Datagram Protocol (UDP) multicast work together to enable efficient one-to-many data streaming over IPv4 networks. While UDP delivers the actual payload without the overhead of connection management," />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-igmp-interacts-with-udp-multicast">How IGMP Interacts with
+UDP Multicast</h1>
+<p>The Internet Group Management Protocol (IGMP) and User Datagram
+Protocol (UDP) multicast work together to enable efficient one-to-many
+data streaming over IPv4 networks. While UDP delivers the actual payload
+without the overhead of connection management, IGMP operates as the
+control-plane signaling mechanism between local hosts and routers. This
+article explains how IGMP establishes and maintains the network paths
+required for UDP multicast traffic to reach interested receivers without
+overwhelming the local network.</p>
+<h2 id="the-distinct-roles-of-igmp-and-udp">The Distinct Roles of IGMP
+and UDP</h2>
+<p>Multicast networking separates control signaling from data
+delivery:</p>
+<ul>
+<li><strong>UDP Multicast (Data Plane):</strong> Operates at Layer 4
+(Transport). Applications use UDP to transmit continuous streams (such
+as video feeds, financial data, or VoIP) to a single multicast group IP
+address (224.0.0.0 to 239.255.255.255). UDP does not manage network
+topologies, group memberships, or routing states.</li>
+<li><strong>IGMP (Control Plane):</strong> Operates at Layer 3
+(Network). IPv4 hosts use IGMP to inform adjacent multicast routers of
+their desire to receive traffic directed to specific multicast
+addresses.</li>
+</ul>
+<h2 id="step-by-step-interaction-process">Step-by-Step Interaction
+Process</h2>
+<h3 id="1-joining-a-multicast-group">1. Joining a Multicast Group</h3>
+<p>When an application wants to receive a UDP multicast stream, it binds
+to a UDP port and requests to join a multicast group IP address via an
+operating system socket call. The host operating system's networking
+stack then generates an <strong>IGMP Membership Report</strong> (Join
+message) and broadcasts it onto the local subnet.</p>
+<h3 id="2-router-path-establishment">2. Router Path Establishment</h3>
+<p>The local multicast-enabled router receives the IGMP Membership
+Report. It updates its multicast forwarding table, marking the receiving
+interface as active for that specific group. The router then uses
+upstream multicast routing protocols (such as Protocol Independent
+Multicast, or PIM) to pull the incoming UDP stream from the source
+toward that local subnet.</p>
+<h3 id="3-delivering-the-udp-stream">3. Delivering the UDP Stream</h3>
+<p>Once the multicast route is established, the router receives UDP
+packets addressed to the multicast group and forwards them onto the
+local subnet. The host’s network interface controller (NIC) accepts
+these packets and passes them up the stack to the UDP socket listening
+on the specified port.</p>
+<h3 id="4-membership-maintenance">4. Membership Maintenance</h3>
+<p>To ensure bandwidth is not wasted on inactive sessions, multicast
+routers periodically send <strong>IGMP Membership Queries</strong> to
+the subnet. Receiving hosts respond with an IGMP Membership Report to
+confirm they are still listening to the stream. As long as at least one
+host responds, the router continues forwarding the UDP packets.</p>
+<h3 id="5-leaving-a-multicast-group">5. Leaving a Multicast Group</h3>
+<p>When the host application closes the socket or unsubscribes from the
+feed:</p>
+<ul>
+<li>In <strong>IGMPv2 and IGMPv3</strong>, the host sends an explicit
+<strong>IGMP Leave Group</strong> message to the router.</li>
+<li>The router sends a Group-Specific Query to verify if any other hosts
+on the subnet require the stream.</li>
+<li>If no other hosts respond, the router drops the multicast state for
+that interface and stops forwarding the UDP traffic.</li>
+</ul>
+<h2 id="layer-2-optimization-igmp-snooping">Layer 2 Optimization: IGMP
+Snooping</h2>
+<p>On local Ethernet segments, switches normally treat multicast frames
+as broadcast traffic, flooding them to all switch ports. To prevent
+this, modern switches use <strong>IGMP Snooping</strong>.</p>
+<p>By inspecting (snooping on) the IGMP Join and Leave messages passing
+between hosts and the router, the switch maps specific multicast MAC
+addresses to physical switch ports. Consequently, the incoming UDP
+multicast stream is delivered only to the specific physical switch ports
+containing subscribed receivers rather than every device on the LAN.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

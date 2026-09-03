@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Get Sender IP from Incoming UDP Packet - udp</title>
+    <meta name="description" content="Retrieving the sender's IP address from an incoming UDP packet is a standard network programming task handled directly at the socket layer. Because UDP is a connectionless protocol, the receiving socket does not maintain an active connection with the cli">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-to-get-sender-ip-from-incoming-udp-packet">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Get Sender IP from Incoming UDP Packet - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-to-get-sender-ip-from-incoming-udp-packet" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Retrieving the sender's IP address from an incoming UDP packet is a standard network programming task handled directly at the socket layer. Because UDP is a connectionless protocol, the receiving socket does not maintain an active connection with the cli" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-to-get-sender-ip-from-incoming-udp-packet">How to Get Sender
+IP from Incoming UDP Packet</h1>
+<p>Retrieving the sender's IP address from an incoming UDP packet is a
+standard network programming task handled directly at the socket layer.
+Because UDP is a connectionless protocol, the receiving socket does not
+maintain an active connection with the client; instead, the underlying
+operating system inspects the IP header of each incoming datagram and
+exposes the source address via socket reading APIs. This guide
+demonstrates how to extract the sender's IP address and port across
+several popular programming languages, including Python, Node.js, C, and
+Go.</p>
+<h2 id="python">Python</h2>
+<p>In Python, the built-in <code>socket</code> module provides the
+<code>recvfrom()</code> method, which returns both the incoming data
+buffer and a tuple containing the sender's IP address and port
+number.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> socket</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a UDP socket</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>server_socket <span class="op">=</span> socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>server_socket.bind((<span class="st">&#39;0.0.0.0&#39;</span>, <span class="dv">8080</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Listening for incoming UDP packets on port 8080...&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># recvfrom returns (data, (sender_ip, sender_port))</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    data, (sender_ip, sender_port) <span class="op">=</span> server_socket.recvfrom(<span class="dv">1024</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Received message from </span><span class="sc">{</span>sender_ip<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>sender_port<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Data: </span><span class="sc">{</span>data<span class="sc">.</span>decode(<span class="st">&#39;utf-8&#39;</span>, errors<span class="op">=</span><span class="st">&#39;ignore&#39;</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<h2 id="nodejs">Node.js</h2>
+<p>Node.js uses the native <code>dgram</code> module to handle UDP
+communication. When a message arrives, the <code>'message'</code> event
+provides an <code>rinfo</code> (remote info) object containing the
+sender's metadata.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> dgram <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;dgram&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> server <span class="op">=</span> dgram<span class="op">.</span><span class="fu">createSocket</span>(<span class="st">&#39;udp4&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>server<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;message&#39;</span><span class="op">,</span> (msg<span class="op">,</span> rinfo) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// rinfo contains address, family, port, and size</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> senderIp <span class="op">=</span> rinfo<span class="op">.</span><span class="at">address</span><span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> senderPort <span class="op">=</span> rinfo<span class="op">.</span><span class="at">port</span><span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Received packet from </span><span class="sc">${</span>senderIp<span class="sc">}</span><span class="vs">:</span><span class="sc">${</span>senderPort<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Message: </span><span class="sc">${</span>msg<span class="op">.</span><span class="fu">toString</span>()<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>server<span class="op">.</span><span class="fu">bind</span>(<span class="dv">8080</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;UDP server listening on port 8080&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<h2 id="c-posix-sockets">C (POSIX Sockets)</h2>
+<p>In C and C++, you pass a pointer to a <code>sockaddr_in</code>
+structure into the POSIX <code>recvfrom()</code> system call. The kernel
+fills this structure with the client's information, which you convert
+into a human-readable string using <code>inet_ntop()</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;arpa/inet.h&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> sockfd <span class="op">=</span> socket<span class="op">(</span>AF_INET<span class="op">,</span> SOCK_DGRAM<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> sockaddr_in server_addr<span class="op">,</span> client_addr<span class="op">;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    socklen_t client_len <span class="op">=</span> <span class="kw">sizeof</span><span class="op">(</span>client_addr<span class="op">);</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> buffer<span class="op">[</span><span class="dv">1024</span><span class="op">];</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> sender_ip<span class="op">[</span>INET_ADDRSTRLEN<span class="op">];</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    memset<span class="op">(&amp;</span>server_addr<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>server_addr<span class="op">));</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    server_addr<span class="op">.</span>sin_family <span class="op">=</span> AF_INET<span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    server_addr<span class="op">.</span>sin_addr<span class="op">.</span>s_addr <span class="op">=</span> INADDR_ANY<span class="op">;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    server_addr<span class="op">.</span>sin_port <span class="op">=</span> htons<span class="op">(</span><span class="dv">8080</span><span class="op">);</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    bind<span class="op">(</span>sockfd<span class="op">,</span> <span class="op">(</span><span class="kw">struct</span> sockaddr<span class="op">*)&amp;</span>server_addr<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>server_addr<span class="op">));</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Waiting for UDP packet on port 8080...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ssize_t</span> bytes_received <span class="op">=</span> recvfrom<span class="op">(</span>sockfd<span class="op">,</span> buffer<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>buffer<span class="op">)</span> <span class="op">-</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                                      <span class="op">(</span><span class="kw">struct</span> sockaddr<span class="op">*)&amp;</span>client_addr<span class="op">,</span> <span class="op">&amp;</span>client_len<span class="op">);</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>bytes_received <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        buffer<span class="op">[</span>bytes_received<span class="op">]</span> <span class="op">=</span> <span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span><span class="op">;</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Convert the binary IP address to a string</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        inet_ntop<span class="op">(</span>AF_INET<span class="op">,</span> <span class="op">&amp;(</span>client_addr<span class="op">.</span>sin_addr<span class="op">),</span> sender_ip<span class="op">,</span> INET_ADDRSTRLEN<span class="op">);</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> sender_port <span class="op">=</span> ntohs<span class="op">(</span>client_addr<span class="op">.</span>sin_port<span class="op">);</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Received packet from </span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> sender_ip<span class="op">,</span> sender_port<span class="op">);</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Payload: </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> buffer<span class="op">);</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    close<span class="op">(</span>sockfd<span class="op">);</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="go">Go</h2>
+<p>Go's standard <code>net</code> package provides the
+<code>ReadFromUDP</code> method on a <code>*net.UDPConn</code> instance.
+This returns the number of bytes read and a <code>*net.UDPAddr</code>
+struct containing the remote address.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">package</span> main</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="op">(</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;net&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    addr <span class="op">:=</span> net<span class="op">.</span>UDPAddr<span class="op">{</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        Port<span class="op">:</span> <span class="dv">8080</span><span class="op">,</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        IP<span class="op">:</span>   net<span class="op">.</span>ParseIP<span class="op">(</span><span class="st">&quot;0.0.0.0&quot;</span><span class="op">),</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    conn<span class="op">,</span> err <span class="op">:=</span> net<span class="op">.</span>ListenUDP<span class="op">(</span><span class="st">&quot;udp&quot;</span><span class="op">,</span> <span class="op">&amp;</span>addr<span class="op">)</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">panic</span><span class="op">(</span>err<span class="op">)</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">defer</span> conn<span class="op">.</span>Close<span class="op">()</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    fmt<span class="op">.</span>Println<span class="op">(</span><span class="st">&quot;Listening for UDP packets on port 8080...&quot;</span><span class="op">)</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    buffer <span class="op">:=</span> <span class="bu">make</span><span class="op">([]</span><span class="dt">byte</span><span class="op">,</span> <span class="dv">1024</span><span class="op">)</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">{</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        <span class="co">// ReadFromUDP returns the number of bytes and the remote UDPAddr</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        n<span class="op">,</span> remoteAddr<span class="op">,</span> err <span class="op">:=</span> conn<span class="op">.</span>ReadFromUDP<span class="op">(</span>buffer<span class="op">)</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>            fmt<span class="op">.</span>Println<span class="op">(</span><span class="st">&quot;Error reading:&quot;</span><span class="op">,</span> err<span class="op">)</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        senderIP <span class="op">:=</span> remoteAddr<span class="op">.</span>IP<span class="op">.</span>String<span class="op">()</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        senderPort <span class="op">:=</span> remoteAddr<span class="op">.</span>Port</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Printf<span class="op">(</span><span class="st">&quot;Received %d bytes from %s:%d</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> n<span class="op">,</span> senderIP<span class="op">,</span> senderPort<span class="op">)</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Printf<span class="op">(</span><span class="st">&quot;Data: %s</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> <span class="dt">string</span><span class="op">(</span>buffer<span class="op">[:</span>n<span class="op">]))</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

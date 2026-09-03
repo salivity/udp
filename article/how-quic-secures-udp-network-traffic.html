@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How QUIC Secures UDP Network Traffic - udp</title>
+    <meta name="description" content="The integration of the QUIC transport protocol fundamentally transforms User Datagram Protocol (UDP) traffic from an unauthenticated, plaintext medium into a secure, encrypted communication channel. By embedding Transport Layer Security (TLS 1.3) directl">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-quic-secures-udp-network-traffic">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How QUIC Secures UDP Network Traffic - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-quic-secures-udp-network-traffic" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The integration of the QUIC transport protocol fundamentally transforms User Datagram Protocol (UDP) traffic from an unauthenticated, plaintext medium into a secure, encrypted communication channel. By embedding Transport Layer Security (TLS 1.3) directl" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-quic-secures-udp-network-traffic">How QUIC Secures UDP
+Network Traffic</h1>
+<p>The integration of the QUIC transport protocol fundamentally
+transforms User Datagram Protocol (UDP) traffic from an unauthenticated,
+plaintext medium into a secure, encrypted communication channel. By
+embedding Transport Layer Security (TLS 1.3) directly into the transport
+layer, QUIC eliminates traditional vulnerabilities associated with
+standard UDP, such as data tampering, eavesdropping, connection
+hijacking, and amplification attacks, while maintaining the performance
+advantages of a connectionless protocol.</p>
+<h3 id="mandatory-native-encryption">Mandatory, Native Encryption</h3>
+<p>Unlike TCP, where TLS is implemented as an optional application layer
+protocol (HTTPS), QUIC integrates TLS 1.3 directly into its core design.
+In traditional UDP, payloads and headers are transmitted in cleartext
+unless an application specifically secures them. Under QUIC, nearly all
+packet components—including the transport payload and most packet
+metadata—are encrypted by default using Authenticated Encryption with
+Associated Data (AEAD). This architecture ensures that intermediary
+nodes on the network cannot inspect or alter packet contents,
+effectively thwarting passive surveillance and active man-in-the-middle
+(MITM) attacks.</p>
+<h3 id="prevention-of-amplification-and-spoofing-attacks">Prevention of
+Amplification and Spoofing Attacks</h3>
+<p>Standard UDP is stateless and lacks a built-in handshake, making it a
+primary vector for Distributed Denial of Service (DDoS) amplification
+and reflection attacks. Attackers typically forge the victim's source IP
+address to trigger large responses from open UDP services. QUIC
+mitigates this risk by enforcing strict source address validation during
+the initial connection phase:</p>
+<ul>
+<li><strong>Initial Packet Padding:</strong> Clients must pad initial
+handshake packets to a minimum size (typically 1,200 bytes), ensuring
+that any initial response from the server cannot drastically exceed the
+size of the request.</li>
+<li><strong>Anti-Amplification Limits:</strong> Until the client proves
+ownership of its IP address through a cryptographic exchange or
+validation token, the server is restricted from sending more than three
+times the amount of data it received.</li>
+</ul>
+<h3 id="protection-against-connection-hijacking">Protection Against
+Connection Hijacking</h3>
+<p>Traditional transport connections are identified by a 4-tuple: source
+IP, source port, destination IP, and destination port. When an endpoint
+changes networks (such as transitioning from Wi-Fi to cellular data),
+traditional connections break or become vulnerable to spoofing. QUIC
+resolves this by identifying connections using a unique,
+cryptographically generated Connection ID (CID).</p>
+<p>When a network migration occurs:</p>
+<ul>
+<li>The connection remains intact without needing to renegotiate from
+scratch.</li>
+<li>New CIDs are issued securely over the encrypted channel.</li>
+<li>Attackers cannot hijack the session by merely spoofing an IP
+address, as they lack the cryptographic keys tied to the Connection
+ID.</li>
+</ul>
+<h3 id="integrity-of-transport-level-metadata">Integrity of
+Transport-Level Metadata</h3>
+<p>In conventional network stacks, transport metadata such as packet
+numbers and control flags are visible in the network header, allowing
+on-path network devices to track, throttle, or inject malicious control
+signals (like TCP RST packets). QUIC encrypts and authenticates its
+transport headers along with the payload. This header protection
+prevents external entities from forging control signals, conducting
+packet injection attacks, or fingerprinting user activity based on
+sequence patterns.</p>
+<h3 id="replay-attack-mitigation-in-0-rtt-handshakes">Replay Attack
+Mitigation in 0-RTT Handshakes</h3>
+<p>QUIC supports zero round-trip time (0-RTT) connection resumption,
+allowing returning clients to send data immediately. While 0-RTT
+connections in traditional protocols introduce replay attack
+vulnerabilities, QUIC enforces strict TLS 1.3 anti-replay mechanisms.
+Application protocols operating over QUIC are provided with explicit
+signals to restrict non-idempotent actions (such as financial
+transactions or state modifications) over 0-RTT data, ensuring that
+replayed packets cannot execute unauthorized duplicate operations.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

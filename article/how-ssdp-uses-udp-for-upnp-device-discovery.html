@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How SSDP Uses UDP for UPnP Device Discovery - udp</title>
+    <meta name="description" content="The Simple Service Discovery Protocol (SSDP) serves as the discovery foundation for Universal Plug and Play (UPnP) architectures, enabling networked devices to automatically discover one another and advertise their services. By utilizing the User Datagra">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-ssdp-uses-udp-for-upnp-device-discovery">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How SSDP Uses UDP for UPnP Device Discovery - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-ssdp-uses-udp-for-upnp-device-discovery" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The Simple Service Discovery Protocol (SSDP) serves as the discovery foundation for Universal Plug and Play (UPnP) architectures, enabling networked devices to automatically discover one another and advertise their services. By utilizing the User Datagra" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-ssdp-uses-udp-for-upnp-device-discovery">How SSDP Uses UDP
+for UPnP Device Discovery</h1>
+<p>The Simple Service Discovery Protocol (SSDP) serves as the discovery
+foundation for Universal Plug and Play (UPnP) architectures, enabling
+networked devices to automatically discover one another and advertise
+their services. By utilizing the User Datagram Protocol (UDP) instead of
+connection-oriented protocols like TCP, SSDP provides a lightweight,
+connectionless mechanism for rapid multicast communication across local
+networks. This article explains how SSDP leverages UDP multicast and
+unicast messaging to announce device presence, search for available
+network services, and establish seamless plug-and-play connectivity
+without requiring manual user configuration or centralized directory
+servers.</p>
+<h2 id="the-role-of-udp-in-ssdp">The Role of UDP in SSDP</h2>
+<p>SSDP relies on HTTP over UDP, often referred to as HTTPU (HTTP
+Unicast/Multicast over UDP). Standard HTTP operations rely on TCP to
+maintain a reliable, dedicated connection between a client and a server.
+In contrast, local network discovery benefits from broadcasting messages
+simultaneously to multiple devices. UDP is inherently connectionless and
+supports multicast transmission, making it the ideal transport layer
+protocol for SSDP.</p>
+<p>SSDP operates over standard reserved networking endpoints:</p>
+<ul>
+<li><strong>Port:</strong> UDP port 1900</li>
+<li><strong>IPv4 Multicast Address:</strong>
+<code>239.255.255.250</code></li>
+<li><strong>IPv6 Multicast Address:</strong> <code>[FF02::C]</code>
+(link-local) or <code>[FF05::C]</code> (site-local)</li>
+</ul>
+<h2 id="device-advertisement-the-notify-method">Device Advertisement:
+The NOTIFY Method</h2>
+<p>When a UPnP-compatible device (such as a media server, printer, or
+smart router) connects to a local network, it must inform other nodes of
+its existence and available capabilities. It achieves this by sending
+multicast UDP datagrams to the SSDP multicast group address on port 1900
+using the <code>NOTIFY</code> method.</p>
+<p>These advertisements contain standard HTTP-style headers,
+including:</p>
+<ul>
+<li><strong>NT (Notification Type):</strong> Identifies the device type
+or service being advertised.</li>
+<li><strong>NTS (Notification Sub-Type):</strong> Indicates the event
+type, commonly <code>ssdp:alive</code> when the device joins the network
+or renews its lease, and <code>ssdp:byebye</code> when gracefully
+disconnecting.</li>
+<li><strong>LOCATION:</strong> Contains a URL (typically HTTP over TCP)
+pointing to the device's XML description file, which outlines its full
+capabilities and control endpoints.</li>
+<li><strong>CACHE-CONTROL:</strong> Specifies the duration (in seconds)
+that other devices should consider the advertisement valid before
+discarding it.</li>
+<li><strong>USN (Unique Service Name):</strong> A unique identifier for
+the specific device instance or service.</li>
+</ul>
+<p>Because UDP does not guarantee delivery, devices typically broadcast
+<code>ssdp:alive</code> notifications multiple times upon startup to
+minimize the risk of dropped packets.</p>
+<h2 id="service-discovery-the-m-search-method">Service Discovery: The
+M-SEARCH Method</h2>
+<p>When a control point (such as a smartphone, PC, or application) wants
+to find devices on the network, it does not need to query individual IP
+addresses. Instead, it sends an active discovery request using the
+<code>M-SEARCH</code> method over UDP multicast to
+<code>239.255.255.250:1900</code>.</p>
+<p>The <code>M-SEARCH</code> request defines search criteria using the
+<strong>ST (Search Target)</strong> header. A control point can search
+for:</p>
+<ul>
+<li>All available devices (<code>ST: ssdp:all</code>)</li>
+<li>Root devices only (<code>ST: upnp:rootdevice</code>)</li>
+<li>A specific device type or unique service identifier</li>
+</ul>
+<p>Any device on the local network listening on UDP port 1900 that
+matches the <code>ST</code> criteria processes the request. To prevent
+network congestion caused by simultaneous replies, the
+<code>M-SEARCH</code> request includes an <strong>MX (Maximum Wait
+Time)</strong> header, instructing devices to randomize their response
+delay within the specified window (e.g., 1 to 5 seconds).</p>
+<h2 id="unicast-udp-responses">Unicast UDP Responses</h2>
+<p>While discovery queries and presence notifications use UDP multicast
+to reach the entire subnet, the response to an <code>M-SEARCH</code>
+request is sent via <strong>unicast UDP</strong>.</p>
+<p>The responding device sends an <code>HTTP/1.1 200 OK</code> datagram
+directly back to the IP address and UDP port from which the control
+point initiated the search. This response includes the device's
+<code>LOCATION</code>, <code>ST</code>, <code>USN</code>, and
+<code>CACHE-CONTROL</code> headers. Once the control point receives this
+UDP datagram, it switches from SSDP to standard TCP-based HTTP requests
+to download the XML device description file indicated in the
+<code>LOCATION</code> header and begin direct control interactions.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

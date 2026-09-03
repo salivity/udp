@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Hackers Use UDP to Bypass Stateful Firewalls - udp</title>
+    <meta name="description" content="This article explores how malicious actors exploit the User Datagram Protocol (UDP) to circumvent stateful firewall protections. Because UDP is inherently connectionless, stateful firewalls must rely on simulated state tables and temporary pinholes to ma">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/how-hackers-use-udp-to-bypass-stateful-firewalls">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Hackers Use UDP to Bypass Stateful Firewalls - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/how-hackers-use-udp-to-bypass-stateful-firewalls" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explores how malicious actors exploit the User Datagram Protocol (UDP) to circumvent stateful firewall protections. Because UDP is inherently connectionless, stateful firewalls must rely on simulated state tables and temporary pinholes to ma" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="how-hackers-use-udp-to-bypass-stateful-firewalls">How Hackers
+Use UDP to Bypass Stateful Firewalls</h1>
+<p>This article explores how malicious actors exploit the User Datagram
+Protocol (UDP) to circumvent stateful firewall protections. Because UDP
+is inherently connectionless, stateful firewalls must rely on simulated
+state tables and temporary pinholes to manage inbound and outbound
+traffic. Attackers leverage these architectural concessions through
+techniques such as UDP hole punching, source port spoofing, packet
+fragmentation, and protocol tunneling to pierce perimeter defenses and
+maintain unauthorized network access.</p>
+<h2 id="the-challenge-of-udp-for-stateful-firewalls">The Challenge of
+UDP for Stateful Firewalls</h2>
+<p>Stateful firewalls track the state of active network connections to
+determine whether incoming traffic is legitimate. For Transmission
+Control Protocol (TCP), this is straightforward because TCP uses a
+formal three-way handshake (<code>SYN</code>, <code>SYN-ACK</code>,
+<code>ACK</code>) and explicit teardown flags (<code>FIN</code>,
+<code>RST</code>).</p>
+<p>UDP, by contrast, is completely connectionless. It has no handshakes,
+sequence numbers, or termination signals. To handle UDP, a stateful
+firewall must implement "pseudo-state" tracking:</p>
+<ol type="1">
+<li>An internal client sends an outbound UDP packet to an external
+server.</li>
+<li>The firewall records the internal IP/port and external IP/port in
+its state table.</li>
+<li>The firewall opens a temporary inbound rule (a "pinhole") allowing
+incoming packets from that specific external IP/port back to the
+internal client.</li>
+<li>An inactivity timer (often 30 to 120 seconds) counts down; if no
+further packets are observed, the pinhole closes.</li>
+</ol>
+<p>Attackers exploit the mechanics of these pseudo-states to bypass
+firewall filtering.</p>
+<h2 id="1-unsolicited-inbound-injection-via-udp-hole-punching">1.
+Unsolicited Inbound Injection via UDP Hole Punching</h2>
+<p>UDP hole punching is standard for peer-to-peer (P2P) networking, but
+attackers weaponize it for persistence and command-and-control (C2).</p>
+<p>When a compromised host or rogue payload inside a network sends a
+single outbound UDP datagram to an attacker-controlled endpoint, the
+firewall creates a state entry. Even if the firewall blocks unsolicited
+inbound traffic, the inbound rule created by the outbound packet allows
+the attacker’s external server to immediately send commands back through
+the newly created pinhole. By sending periodic "keep-alive" datagrams,
+the attacker keeps the firewall state entry perpetually open.</p>
+<h2 id="2-exploiting-trusted-well-known-source-ports">2. Exploiting
+Trusted Well-Known Source Ports</h2>
+<p>Many basic stateful configurations automatically trust incoming UDP
+traffic if the source port belongs to a standard service, such as UDP
+port 53 (DNS) or UDP port 123 (NTP), under the assumption that it is a
+response to an internal query.</p>
+<p>Attackers can configure external scanning or exploitation tools to
+originate from source port 53. If the stateful firewall is poorly
+configured to prioritize static port rules over strict state
+verification, the inbound traffic passes through directly to the target
+system behind the firewall.</p>
+<h2 id="3-udp-ip-and-port-spoofing">3. UDP IP and Port Spoofing</h2>
+<p>Because UDP lacks sequence validation and handshake verification, it
+is vulnerable to source address spoofing. If an attacker determines that
+an internal host frequently communicates over UDP with a specific
+external IP (such as an external DNS resolver or time server), the
+attacker can forge UDP packets using that external server's IP
+address.</p>
+<p>If the firewall has an open state entry for communication between the
+internal host and that specific external IP, it will accept the spoofed
+inbound packet as a legitimate response and forward it to the internal
+host.</p>
+<h2 id="4-udp-fragmentation-attacks">4. UDP Fragmentation Attacks</h2>
+<p>When UDP packets exceed the Maximum Transmission Unit (MTU), they are
+split into IP fragments. Only the initial fragment contains the UDP
+header with the source and destination port numbers. Subsequent
+fragments contain only the IP header with an offset identifier.</p>
+<p>Some stateful firewalls do not properly reassemble fragments before
+inspecting them, or they lack the memory capacity to buffer out-of-order
+fragments. Attackers take advantage of this by:</p>
+<ul>
+<li>Sending a benign initial fragment that satisfies firewall
+rules.</li>
+<li>Following it with malicious fragments that contain the payload.</li>
+<li>Sending fragmented packets where the malicious content is hidden in
+non-initial fragments that pass through because the firewall cannot
+inspect Layer 4 information on secondary fragments.</li>
+</ul>
+<h2 id="5-protocol-tunneling-and-encapsulation">5. Protocol Tunneling
+and Encapsulation</h2>
+<p>Stateful firewalls often permit outbound UDP traffic on common ports
+to prevent disruption of essential services like DNS queries (port 53)
+or WebRTC/QUIC traffic (ports 443/80).</p>
+<p>Attackers encapsulate non-UDP protocols (such as SSH, RDP, or raw
+shell payloads) inside standard UDP packets. Because the firewall only
+evaluates the outer UDP transport layer and verifies that an outbound
+connection was initiated, it allows the bidirectional data stream
+without inspecting the malicious payload embedded within the payload
+field.</p>
+<h2 id="6-state-table-exhaustion">6. State Table Exhaustion</h2>
+<p>Stateful firewalls maintain connection states in memory. Attackers
+can flood a network with massive volumes of randomized UDP packets to
+non-existent external hosts. Each outbound packet forces the firewall to
+allocate memory for a new state entry.</p>
+<p>Once the state table is fully saturated:</p>
+<ul>
+<li>The firewall may drop all new legitimate traffic (Denial of
+Service).</li>
+<li>Certain firewalls fail open, disabling stateful tracking and
+allowing unfiltered packet traversal across the perimeter.</li>
+</ul>
+<h2 id="defense-and-mitigation">Defense and Mitigation</h2>
+<p>Mitigating UDP-based stateful firewall bypasses requires measures
+beyond simple port-level tracking:</p>
+<ul>
+<li><strong>Deep Packet Inspection (DPI):</strong> Validate that UDP
+traffic matches expected protocol specifications (e.g., verifying that
+data on port 53 complies with strict DNS format).</li>
+<li><strong>Aggressive UDP Timeouts:</strong> Reduce UDP state table
+expiration timers to minimize the lifetime of open pinholes.</li>
+<li><strong>Strict Reverse Path Forwarding (uRPF):</strong> Implement
+uRPF on edge routers to mitigate IP spoofing.</li>
+<li><strong>Virtual Fragment Reassembly:</strong> Require firewalls to
+fully reassemble and inspect all fragmented UDP datagrams before routing
+them to internal segments.</li>
+<li><strong>Strict Egress Filtering:</strong> Restrict internal
+endpoints from initiating outbound UDP connections to arbitrary external
+destinations.</li>
+</ul></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

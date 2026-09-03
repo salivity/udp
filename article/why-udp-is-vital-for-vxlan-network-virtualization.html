@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4Y4YXFHZS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-R4Y4YXFHZS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why UDP Is Vital for VXLAN Network Virtualization - udp</title>
+    <meta name="description" content="Virtual Extensible LAN (VXLAN) has become the standard network virtualization protocol for modern data centers and cloud environments, addressing the scalability limitations of traditional VLANs. At the core of VXLAN's functionality is the User Datagram">
+    <link rel="canonical" href="https://salivity.github.io/udp/article/why-udp-is-vital-for-vxlan-network-virtualization">
+    <link rel="icon" href="/udp/favicon.ico">
+    <link rel="stylesheet" href="/udp/css/style.css">
+    <link media="print" rel="stylesheet" href="/udp/css/print.css">
+    <script src="/udp/js/fuse.min.js"></script>
+    <script src="/udp/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why UDP Is Vital for VXLAN Network Virtualization - udp" />
+    <meta property="og:url" content="https://salivity.github.io/udp/article/why-udp-is-vital-for-vxlan-network-virtualization" />
+    <meta property="og:image:url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/udp/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Virtual Extensible LAN (VXLAN) has become the standard network virtualization protocol for modern data centers and cloud environments, addressing the scalability limitations of traditional VLANs. At the core of VXLAN's functionality is the User Datagram" />
+    <link rel="manifest" href="/udp/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/udp/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>udp</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="https://github.com/salivity" title="Github" aria-label="Go To Github Profile Page"><svg class="svg-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.27a11 11 0 00-3.48 21.46c.55.09.73-.28.73-.55v-1.84c-3.03.64-3.67-1.46-3.67-1.46-.55-1.29-1.28-1.65-1.28-1.65-.92-.65.1-.65.1-.65 1.1 0 1.73 1.1 1.73 1.1.92 1.65 2.57 1.2 3.21.92a2 2 0 01.64-1.47c-2.47-.27-5.04-1.19-5.04-5.5 0-1.1.46-2.1 1.2-2.84a3.76 3.76 0 010-2.93s.91-.28 3.11 1.1c1.8-.49 3.7-.49 5.5 0 2.1-1.38 3.02-1.1 3.02-1.1a3.76 3.76 0 010 2.93c.83.74 1.2 1.74 1.2 2.94 0 4.21-2.57 5.13-5.04 5.4.45.37.82.92.82 2.02v3.03c0 .27.1.64.73.55A11 11 0 0012 1.27"></path></svg></a></li>
+                <li><a href="/udp/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article><h1 id="why-udp-is-vital-for-vxlan-network-virtualization">Why UDP Is
+Vital for VXLAN Network Virtualization</h1>
+<p>Virtual Extensible LAN (VXLAN) has become the standard network
+virtualization protocol for modern data centers and cloud environments,
+addressing the scalability limitations of traditional VLANs. At the core
+of VXLAN's functionality is the User Datagram Protocol (UDP). This
+article explains how VXLAN utilizes UDP encapsulation to transport Layer
+2 Ethernet traffic across Layer 3 IP networks, facilitate equal-cost
+multi-path (ECMP) load balancing through dynamic source port allocation,
+and maintain low latency while ensuring broad compatibility with
+existing networking hardware.</p>
+<h3 id="mac-in-udp-encapsulation">MAC-in-UDP Encapsulation</h3>
+<p>VXLAN operates by creating an overlay network on top of an existing
+physical Layer 3 IP network (the underlay). To achieve this, it uses a
+technique known as MAC-in-UDP encapsulation.</p>
+<p>When a virtual machine or container sends a Layer 2 Ethernet frame,
+the VXLAN Tunnel Endpoint (VTEP) wraps the entire original frame into a
+standard UDP packet. The packet consists of an outer IP header, an outer
+UDP header, a VXLAN header containing a 24-bit VXLAN Network Identifier
+(VNI), and the original inner Layer 2 frame. UDP provides the transport
+envelope necessary to route these Layer 2 frames natively across
+standard IP routing infrastructure.</p>
+<h3 id="efficient-ecmp-load-balancing">Efficient ECMP Load
+Balancing</h3>
+<p>One of the most critical reasons VXLAN relies on UDP is to enable
+Equal-Cost Multi-Pathing (ECMP) and Link Aggregation (LAG) across
+standard network switches.</p>
+<p>Underlay switches typically balance network traffic across parallel
+physical links by calculating a hash based on the packet's 5-tuple:
+source IP, destination IP, protocol, source port, and destination port.
+Because VXLAN traffic between two VTEPs shares the same source and
+destination IP addresses and destination UDP port (assigned as port 4789
+by IANA), traffic would normally be pinned to a single physical
+path.</p>
+<p>VXLAN solves this by dynamically calculating the <strong>outer UDP
+source port</strong> based on a hash of the inner Layer 2/3 frame
+headers. As a result, different traffic flows between the same two VTEPs
+receive different UDP source ports. Underlay switches can then
+distribute the VXLAN packets evenly across all available ECMP paths
+without needing to perform deep packet inspection on the encapsulated
+payload.</p>
+<h3 id="universal-layer-3-traversal">Universal Layer 3 Traversal</h3>
+<p>Alternative tunneling protocols often require specialized IP
+protocols (such as GRE) that can encounter issues with intermediate
+firewalls, stateful middleboxes, or Network Address Translation (NAT)
+devices.</p>
+<p>UDP is a foundational Internet protocol supported universally across
+all standard networking equipment. By encapsulating data into standard
+UDP packets, VXLAN traffic passes seamlessly through existing routers,
+firewalls, and switches without requiring hardware upgrades or special
+protocol support on intermediate nodes.</p>
+<h3 id="low-overhead-and-connectionless-design">Low Overhead and
+Connectionless Design</h3>
+<p>VXLAN carries guest traffic that already includes its own transport
+protocols, such as TCP and UDP. Using a connection-oriented transport
+protocol like TCP for the outer encapsulation layer would introduce
+redundant connection handshakes, acknowledgment packets, and
+retransmission mechanisms. This can lead to TCP-over-TCP performance
+degradation, commonly known as TCP meltdown.</p>
+<p>UDP is lightweight and connectionless, introducing minimal protocol
+overhead and no connection state tracking. Reliability, sequencing, and
+flow control are left entirely to the protocols running within the
+overlay payload, ensuring maximum throughput and minimal latency across
+the data center fabric.</p>
+<h3 id="native-hardware-offloading">Native Hardware Offloading</h3>
+<p>Because UDP is ubiquitous, modern Network Interface Cards (NICs) and
+switch ASICs include dedicated hardware offloading capabilities for UDP
+traffic. Features like Receive Side Scaling (RSS), Checksum Offloading,
+and VXLAN Task Offloading allow network hardware to parse and process
+VXLAN packets at line rate without imposing high CPU utilization on host
+servers.</p></article>
+        <div id=comments-container></div>
+
+        <script>
+            const utterancesScript = document.createElement('script');
+            
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/udp'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/udp/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/udp/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>
